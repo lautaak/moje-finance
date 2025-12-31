@@ -6,13 +6,15 @@
 
 html {
   font-size: 16px;
-  /* Default base */
 }
 
-/* Force larger UI on mobile */
+/* AGGRESSIVE MOBILE FIX - Scale everything up by 50% */
 @media (max-width: 640px) {
-  html {
-    /* font-size: 20px !important;  REVERTED: Too big */
+  body {
+    transform: scale(1.5);
+    transform-origin: top left;
+    width: 66.67%;
+    /* Compensate for scale */
   }
 }
 
@@ -21,7 +23,6 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  /* Prevent horizontal scroll on mobile */
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
