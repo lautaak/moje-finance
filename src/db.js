@@ -1,0 +1,26 @@
+import Dexie from 'dexie';
+
+export const db = new Dexie('FinanceAppDB');
+
+db.version(1).stores({
+    transactions: '++id, date, type, categoryId, accountId', // Indexes
+    categories: '++id, name, parentId',
+    accounts: '++id, name',
+    budgets: '++id, categoryId, month'
+});
+
+// Pre-populate default categories if empty
+db.on('populate', () => {
+    db.categories.bulkAdd([
+        { name: 'Jídlo', icon: 'Utensils', color: '#ef4444' },
+        { name: 'Bydlení', icon: 'Home', color: '#3b82f6' },
+        { name: 'Doprava', icon: 'Car', color: '#f59e0b' },
+        { name: 'Zábava', icon: 'Gamepad2', color: '#8b5cf6' },
+        { name: 'Mzda', icon: 'Banknote', color: '#10b981', type: 'income' },
+    ]);
+
+    db.accounts.bulkAdd([
+        { name: 'Hlavní účet', type: 'bank', balance: 0 },
+        { name: 'Hotovost', type: 'cash', balance: 0 },
+    ]);
+});

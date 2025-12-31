@@ -1,0 +1,182 @@
+import React, { useState, useEffect } from 'react';
+import { db } from '../db';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { X, Check } from 'lucide-react';
+
+export default function AddTransactionModal({ isOpen, onClose }) {
+    const [type, setType] = useState('expense');
+    const [amount, setAmount] = useState('');
+    const [note, setNote] = useState('');
+    const [categoryId, setCategoryId] = useState('');
+    const [accountId, setAccountId] = useState('');
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+    // Load data for selects
+    const categories = useLiveQuery(() => db.categories.toArray());
+    const accounts = useLiveQuery(() => db.accounts.toArray());
+
+    // Set defaults when data loads
+    useEffect(() => {
+        if (accounts && accounts.length > 0 && !accountId) {
+            setAccountId(accounts[0].id);
+        }
+        if (categories && categories.length > 0 && !categoryId) {
+            // Try to find a default based on type
+            const defaultCat = categories.find(c => c.type === type) || categories[0];
+            setCategoryId(defaultCat.id);
+        }
+    }, [accounts, categories, type]);
+
+    if (!isOpen) return null;
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!amount || !categoryId || !accountId) return;
+
+        await db.transactions.add({
+            type,
+            amount: parseFloat(amount),
+            categoryId: parseInt(categoryId),
+            accountId: parseInt(accountId),
+            date: new Date(date),
+            note
+        });
+
+        // Update account balance
+        const account = await db.accounts.get(parseInt(accountId));
+        if (account) {
+            const newBalance = type === 'income'
+                ? account.balance + parseFloat(amount)
+                : account.balance - parseFloat(amount);
+
+            await db.accounts.update(parseInt(accountId), { balance: newBalance });
+        }
+
+        // Reset and close
+        setAmount('');
+        setNote('');
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-300">
+
+                {/* Header */}
+                <div className="flex justify-between items-center p-4 border-b border-gray-100">
+                    <h2 className="text-lg font-bold text-gray-900">Nová transakce</h2>
+                    <button onClick={onClose} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                        <X size={20} className="text-gray-500" />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="p-4 space-y-4">
+
+                    {/* Type Switcher */}
+                    <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+                        <button
+                            type="button"
+                            onClick={() => setType('expense')}
+                            className={`py-2 text-sm font-medium rounded-lg transition-all ${type === 'expense'
+                                    ? 'bg-white text-red-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            Výdaj
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setType('income')}
+                            className={`py-2 text-sm font-medium rounded-lg transition-all ${type === 'income'
+                                    ? 'bg-white text-green-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            Příjem
+                        </button>
+                    </div>
+
+                    {/* Amount Input */}
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Částka</label>
+                        <div className="relative">
+                            <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                placeholder="0"
+                                className="w-full text-4xl font-bold text-gray-900 bg-transparent border-none focus:ring-0 p-0 placeholder-gray-300"
+                                autoFocus
+                            />
+                            <span className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-xl">Kč</span>
+                        </div>
+                    </div>
+
+                    {/* Date & Account Row */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-500 mb-1">Datum</label>
+                            <input
+                                type="date"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500 transition-colors"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-500 mb-1">Účet</label>
+                            <select
+                                value={accountId}
+                                onChange={(e) => setAccountId(e.target.value)}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500 transition-colors appearance-none"
+                            >
+                                {accounts?.map(acc => (
+                                    <option key={acc.id} value={acc.id}>{acc.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1">Kategorie</label>
+                        <select
+                            value={categoryId}
+                            onChange={(e) => setCategoryId(e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500 transition-colors appearance-none"
+                        >
+                            <option value="" disabled>Vyberte kategorii</option>
+                            {categories?.map(cat => (
+                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Note */}
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1">Poznámka (volitelné)</label>
+                        <input
+                            type="text"
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            placeholder="Např. Oběd s kolegy"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500 transition-colors"
+                        />
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                        type="submit"
+                        className={`w-full py-4 rounded-xl flex items-center justify-center gap-2 text-white font-bold text-lg shadow-lg hover:brightness-110 active:scale-[0.98] transition-all ${type === 'expense' ? 'bg-red-500 shadow-red-500/30' : 'bg-green-500 shadow-green-500/30'
+                            }`}
+                    >
+                        <Check size={24} />
+                        Uložit {type === 'expense' ? 'výdaj' : 'příjem'}
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    );
+}
