@@ -1,46 +1,46 @@
-// Theme colors configuration
+// Theme colors configuration - Modern, high-contrast, premium palettes
 export const themes = {
     blue: {
-        name: 'Modrá',
-        primary: '#3b82f6',
-        primaryDark: '#2563eb',
-        primaryLight: '#60a5fa',
-        gradient: 'from-blue-600 to-indigo-700'
+        name: 'Královská',
+        primary: '#4f46e5', // indigo-600 (richer than default blue)
+        primaryDark: '#3730a3', // indigo-800
+        primaryLight: '#818cf8', // indigo-400
+        gradient: 'from-indigo-600 to-blue-700'
     },
-    green: {
-        name: 'Zelená',
-        primary: '#10b981',
-        primaryDark: '#059669',
-        primaryLight: '#34d399',
-        gradient: 'from-green-600 to-emerald-700'
+    ocean: {
+        name: 'Oceán',
+        primary: '#0ea5e9', // sky-500
+        primaryDark: '#0369a1', // sky-700
+        primaryLight: '#7dd3fc', // sky-300
+        gradient: 'from-sky-600 to-indigo-600'
+    },
+    emerald: {
+        name: 'Smaragd',
+        primary: '#10b981', // emerald-500
+        primaryDark: '#065f46', // emerald-800
+        primaryLight: '#6ee7b7', // emerald-300
+        gradient: 'from-emerald-600 to-teal-700'
+    },
+    sunset: {
+        name: 'Západ slunce',
+        primary: '#f43f5e', // rose-500
+        primaryDark: '#9f1239', // rose-900
+        primaryLight: '#fb7185', // rose-400
+        gradient: 'from-rose-600 to-orange-500'
     },
     purple: {
-        name: 'Fialová',
-        primary: '#8b5cf6',
-        primaryDark: '#7c3aed',
-        primaryLight: '#a78bfa',
-        gradient: 'from-purple-600 to-violet-700'
+        name: 'Magická',
+        primary: '#8b5cf6', // violet-500
+        primaryDark: '#5b21b6', // violet-800
+        primaryLight: '#c4b5fd', // violet-300
+        gradient: 'from-violet-600 to-fuchsia-700'
     },
-    orange: {
-        name: 'Oranžová',
-        primary: '#f97316',
-        primaryDark: '#ea580c',
-        primaryLight: '#fb923c',
-        gradient: 'from-orange-600 to-amber-700'
-    },
-    pink: {
-        name: 'Růžová',
-        primary: '#ec4899',
-        primaryDark: '#db2777',
-        primaryLight: '#f472b6',
-        gradient: 'from-pink-600 to-rose-700'
-    },
-    teal: {
-        name: 'Tyrkysová',
-        primary: '#14b8a6',
-        primaryDark: '#0d9488',
-        primaryLight: '#2dd4bf',
-        gradient: 'from-teal-600 to-cyan-700'
+    amber: {
+        name: 'Amber',
+        primary: '#f59e0b', // amber-500
+        primaryDark: '#92400e', // amber-800
+        primaryLight: '#fcd34d', // amber-300
+        gradient: 'from-amber-500 to-orange-600'
     }
 };
 
