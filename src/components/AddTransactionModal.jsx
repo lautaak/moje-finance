@@ -98,8 +98,8 @@ export default function AddTransactionModal({ isOpen, onClose }) {
 
                     {/* Amount Input */}
                     <div>
-                        <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Částka</label>
-                        <div className="relative bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 focus-within:border-blue-500 transition-colors">
+                        <label className="block text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">Částka</label>
+                        <div className="relative px-2 py-1">
                             <input
                                 type="text"
                                 inputMode="numeric"
@@ -111,10 +111,10 @@ export default function AddTransactionModal({ isOpen, onClose }) {
                                     }
                                 }}
                                 placeholder="0"
-                                className="w-full text-3xl font-bold text-gray-900 bg-transparent border-none focus:ring-0 p-0 placeholder-gray-300 pr-12"
+                                className="w-full text-4xl font-bold text-gray-900 bg-transparent border-none focus:ring-0 focus:outline-none p-0 placeholder-gray-300 pr-16"
                                 autoFocus
                             />
-                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-xl">Kč</span>
+                            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-xl">Kč</span>
                         </div>
                     </div>
 
