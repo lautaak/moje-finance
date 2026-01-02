@@ -23,7 +23,12 @@ const getCategoryEmoji = (iconName) => {
         'Bus': '🚌',
         'Plane': '✈️',
         'CreditCard': '💳',
-        'Wallet': '👛'
+        'Wallet': '👛',
+        'TrendingUp': '📈',
+        'TrendingDown': '📉',
+        'ShoppingCard': '🛒',
+        'Target': '🎯',
+        'Settings': '⚙️'
     };
     return emojis[iconName] || '💸';
 };
@@ -37,7 +42,8 @@ export default function Dashboard() {
     const totalBalance = accounts?.reduce((acc, account) => acc + account.balance, 0) || 0;
 
     const getCategoryInfo = (categoryId) => {
-        const category = categories?.find(c => c.id === categoryId);
+        // Use loose equality or Number cast for robustness
+        const category = categories?.find(c => Number(c.id) === Number(categoryId));
         return {
             name: category?.name || 'Bez kategorie',
             emoji: getCategoryEmoji(category?.icon)
