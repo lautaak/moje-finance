@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db } from '../db';
-import { Download, Upload, Trash2, Save, FileJson } from 'lucide-react';
+import { Download, Upload, Trash2, Save, FileJson, Palette } from 'lucide-react';
 import CategorySettings from '../components/CategorySettings';
+import { themes, getTheme, setTheme } from '../utils/theme';
 
 export default function SettingsPage() {
     const [message, setMessage] = useState('');
+    const [currentTheme, setCurrentTheme] = useState(getTheme());
+
+    const handleThemeChange = (themeName) => {
+        setTheme(themeName);
+        setCurrentTheme(themeName);
+        setMessage(`Téma změněno na ${themes[themeName].name}`);
+        setTimeout(() => setMessage(''), 2000);
+    };
 
     const handleExport = async () => {
         try {
@@ -76,6 +85,39 @@ export default function SettingsPage() {
 
             {/* Category Management */}
             <CategorySettings />
+
+            {/* Theme Selection */}
+            <section className="space-y-4">
+                <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider opacity-60 px-1">Barevné téma</h2>
+
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+                    <div className="grid grid-cols-3 gap-3">
+                        {Object.entries(themes).map(([key, theme]) => (
+                            <button
+                                key={key}
+                                onClick={() => handleThemeChange(key)}
+                                className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${currentTheme === key
+                                        ? 'border-gray-900 bg-gray-50'
+                                        : 'border-gray-200 hover:border-gray-300 active:bg-gray-50'
+                                    }`}
+                            >
+                                <div
+                                    className="w-12 h-12 rounded-full shadow-md"
+                                    style={{ backgroundColor: theme.primary }}
+                                />
+                                <span className="text-xs font-semibold text-gray-700">{theme.name}</span>
+                                {currentTheme === key && (
+                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-gray-900 rounded-full flex items-center justify-center">
+                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
             {/* Data Management Section */}
             <section className="space-y-4">

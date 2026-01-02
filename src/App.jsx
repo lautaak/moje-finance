@@ -8,6 +8,7 @@ import SettingsPage from './pages/Settings';
 import AddTransactionModal from './components/AddTransactionModal';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { processRecurringTransactions } from './services/recurringService';
+import { applyTheme, getTheme } from './utils/theme';
 
 
 // Components
@@ -28,6 +29,10 @@ function App() {
 
   // Process recurring transactions on app load
   useEffect(() => {
+    // Apply saved theme
+    applyTheme(getTheme());
+
+    // Process recurring transactions
     processRecurringTransactions().catch(err => {
       console.error('Error processing recurring transactions:', err);
     });
