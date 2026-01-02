@@ -29,7 +29,6 @@ db.on('populate', () => {
     ]);
 
     db.accounts.bulkAdd([
-        { name: 'Hlavní účet', type: 'bank', balance: 0 },
-        { name: 'Hotovost', type: 'cash', balance: 0 },
+        { id: 1, name: 'Hlavní účet', type: 'bank', balance: 0 },
     ]);
 });

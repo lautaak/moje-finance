@@ -8,7 +8,6 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
     const [amount, setAmount] = useState('');
     const [note, setNote] = useState('');
     const [categoryId, setCategoryId] = useState('');
-    const [accountId, setAccountId] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [isRecurring, setIsRecurring] = useState(false);
     const [recurringFrequency, setRecurringFrequency] = useState('monthly');
@@ -26,7 +25,6 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
             setAmount(editTransaction.amount.toString());
             setNote(editTransaction.note || '');
             setCategoryId(editTransaction.categoryId);
-            setAccountId(editTransaction.accountId);
             setDate(new Date(editTransaction.date).toISOString().split('T')[0]);
             setIsRecurring(false); // Editing doesn't support recurring yet
         } else {
@@ -39,9 +37,6 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
             setRecurringFrequency('monthly');
             setRecurringDay(1);
 
-            if (accounts && accounts.length > 0 && !accountId) {
-                setAccountId(accounts[0].id);
-            }
             if (categories && categories.length > 0 && !categoryId) {
                 const defaultCat = categories.find(c => c.type === type) || categories[0];
                 setCategoryId(defaultCat.id);
@@ -61,17 +56,19 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
             return;
         }
 
-        if (!categoryId || !accountId) {
-            alert('Vyberte kategorii a účet.');
+        if (!categoryId) {
+            alert('Vyberte kategorii.');
             return;
         }
+
+        const targetAccountId = 1; // Default to Account ID 1 (Main Account)
 
         try {
             if (editTransaction) {
                 // Update existing transaction
                 const oldTx = editTransaction;
                 const oldAccount = await db.accounts.get(Number(oldTx.accountId));
-                const newAccount = await db.accounts.get(Number(accountId));
+                const newAccount = await db.accounts.get(Number(targetAccountId));
 
                 // Reverse old transaction effect
                 if (oldAccount) {
@@ -81,20 +78,20 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                     await db.accounts.update(Number(oldTx.accountId), { balance: reversedBalance });
                 }
 
-                // Apply new transaction effect
+                // Apply new transaction effect (to main account)
                 if (newAccount) {
-                    const freshAccount = await db.accounts.get(Number(accountId)); // Get latest balance
+                    const freshAccount = await db.accounts.get(Number(targetAccountId));
                     const newBalance = type === 'income'
                         ? freshAccount.balance + parsedAmount
                         : freshAccount.balance - parsedAmount;
-                    await db.accounts.update(Number(accountId), { balance: newBalance });
+                    await db.accounts.update(Number(targetAccountId), { balance: newBalance });
                 }
 
                 await db.transactions.update(editTransaction.id, {
                     type,
                     amount: parsedAmount,
                     categoryId: Number(categoryId),
-                    accountId: Number(accountId),
+                    accountId: Number(targetAccountId),
                     date: new Date(date),
                     note
                 });
@@ -104,18 +101,21 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                     type,
                     amount: parsedAmount,
                     categoryId: Number(categoryId),
-                    accountId: Number(accountId),
+                    accountId: Number(targetAccountId),
                     date: new Date(date),
                     note
                 });
 
                 // Update account balance
-                const account = await db.accounts.get(Number(accountId));
+                const account = await db.accounts.get(Number(targetAccountId));
                 if (account) {
                     const newBalance = type === 'income'
                         ? account.balance + parsedAmount
                         : account.balance - parsedAmount;
-                    await db.accounts.update(Number(accountId), { balance: newBalance });
+                    await db.accounts.update(Number(targetAccountId), { balance: newBalance });
+                } else {
+                    // Fallback: create account 1 if it somehow doesn't exist
+                    await db.accounts.add({ id: 1, name: 'Hlavní účet', balance: type === 'income' ? parsedAmount : -parsedAmount });
                 }
 
                 // If recurring, create recurring transaction template
@@ -124,7 +124,7 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                         type,
                         amount: parsedAmount,
                         categoryId: Number(categoryId),
-                        accountId: Number(accountId),
+                        accountId: Number(targetAccountId),
                         note,
                         frequency: recurringFrequency,
                         dayOfMonth: recurringFrequency === 'monthly' ? Number(recurringDay) : null,
@@ -210,25 +210,26 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                         <label className="block text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">Částka</label>
                         <div className="relative bg-gray-50 rounded-xl px-4 py-3 ring-2 ring-transparent focus-within:ring-primary transition-all">
                             <input
-                                type="text"
-                                inputMode="numeric"
-                                value={amount ? parseFloat(amount.replace(/\s/g, '')).toLocaleString('cs-CZ') : ''}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\s/g, '');
-                                    if (value === '' || /^\d+$/.test(value)) {
-                                        setAmount(value);
-                                    }
-                                }}
+                                type="number"
+                                inputMode="decimal"
+                                step="any"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
                                 placeholder="0"
                                 className="w-full text-4xl font-bold text-gray-900 bg-transparent border-none focus:ring-0 focus:outline-none p-0 placeholder-gray-300 pr-16"
                                 autoFocus
                             />
                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-xl">Kč</span>
                         </div>
+                        {amount && !isNaN(parseFloat(amount)) && (
+                            <p className="mt-2 ml-1 text-xs font-bold text-primary/60 uppercase tracking-widest">
+                                Náhled: {parseFloat(amount).toLocaleString('cs-CZ')} Kč
+                            </p>
+                        )}
                     </div>
 
                     {/* Date & Account Row */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                         <div>
                             <label className="block text-xs font-semibold text-gray-500 mb-1">Datum</label>
                             <input
@@ -238,18 +239,6 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                                 className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
                                 required
                             />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-500 mb-1">Účet</label>
-                            <select
-                                value={accountId}
-                                onChange={(e) => setAccountId(e.target.value)}
-                                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors appearance-none"
-                            >
-                                {accounts?.map(acc => (
-                                    <option key={acc.id} value={acc.id}>{acc.name}</option>
-                                ))}
-                            </select>
                         </div>
                     </div>
 

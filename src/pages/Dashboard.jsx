@@ -77,26 +77,6 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* --- ACCOUNTS Grid --- */}
-            <section>
-                <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em] mb-6 ml-1">Vaše Peněženky</h3>
-                <div className="grid grid-cols-2 gap-5">
-                    {accounts?.map(account => (
-                        <div key={account.id} className="bg-white p-7 rounded-[2.5rem] border-2 border-gray-50/50 shadow-premium active:scale-95 transition-all flex flex-col justify-between h-44">
-                            <div className="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center text-primary mb-2 shadow-inner-soft">
-                                <Wallet size={22} strokeWidth={2.5} />
-                            </div>
-                            <div>
-                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1 truncate">{account.name}</p>
-                                <p className="text-2xl font-black text-gray-900 tracking-tight">
-                                    {account.balance.toLocaleString('cs-CZ')} <span className="text-sm font-bold opacity-20">Kč</span>
-                                </p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
             {/* --- MODERN TRANSACTION LIST --- */}
             <section>
                 <div className="flex justify-between items-center mb-6 px-1">
