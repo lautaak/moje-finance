@@ -1,11 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { format, isToday, isYesterday } from 'date-fns';
 import { cs } from 'date-fns/locale';
 import { ArrowUpRight, ArrowDownLeft, Calendar } from 'lucide-react';
+import AddTransactionModal from '../components/AddTransactionModal';
 
 export default function Transactions() {
+    const [editingTransaction, setEditingTransaction] = useState(null);
     const transactions = useLiveQuery(() =>
         db.transactions.orderBy('date').reverse().toArray()
     );
@@ -61,7 +63,11 @@ export default function Transactions() {
                         {txs.map(tx => {
                             const category = getCategory(tx.categoryId);
                             return (
-                                <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                                <div
+                                    key={tx.id}
+                                    onClick={() => setEditingTransaction(tx)}
+                                    className="p-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
+                                >
                                     <div className="flex items-center gap-4">
                                         {/* Icon Circle */}
                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'income' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
@@ -94,7 +100,7 @@ export default function Transactions() {
 
                                     <span className={`font-semibold tabular-nums tracking-tight ${tx.type === 'income' ? 'text-green-600' : 'text-gray-900'
                                         }`}>
-                                        {tx.type === 'expense' ? '-' : '+'}{tx.amount.toLocaleString()} Kč
+                                        {tx.type === 'expense' ? '-' : '+'}{tx.amount.toLocaleString('cs-CZ')} Kč
                                     </span>
                                 </div>
                             );
@@ -102,6 +108,15 @@ export default function Transactions() {
                     </div>
                 </div>
             ))}
+
+            {/* Edit Transaction Modal */}
+            {editingTransaction && (
+                <AddTransactionModal
+                    isOpen={!!editingTransaction}
+                    onClose={() => setEditingTransaction(null)}
+                    editTransaction={editingTransaction}
+                />
+            )}
         </div>
     );
 }
