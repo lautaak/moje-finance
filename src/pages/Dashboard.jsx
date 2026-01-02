@@ -1,15 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowUpRight, ArrowDownLeft, Wallet } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { Wallet, ArrowUpRight, ArrowDownLeft, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import AddTransactionModal from '../components/AddTransactionModal';
 
 export default function Dashboard() {
+    const [editingTransaction, setEditingTransaction] = useState(null);
     const accounts = useLiveQuery(() => db.accounts.toArray());
     const transactions = useLiveQuery(() => db.transactions.orderBy('date').reverse().limit(5).toArray());
+    const categories = useLiveQuery(() => db.categories.toArray());
 
     // Safe checks for undefined data
     const totalBalance = accounts?.reduce((acc, account) => acc + account.balance, 0) || 0;
+
+    const getCategoryName = (categoryId) => {
+        const category = categories?.find(c => c.id === categoryId);
+        return category?.name || 'Bez kategorie';
+    };
 
     return (
         <div className="p-4 pb-24 space-y-6 max-w-2xl mx-auto">
@@ -69,7 +77,11 @@ export default function Dashboard() {
                         <div className="p-6 text-center text-gray-400 text-sm">Zatím žádné pohyby</div>
                     )}
                     {transactions?.map((tx, i) => (
-                        <div key={tx.id} className={`p-4 flex justify-between items-center rounded-2xl active:bg-gray-50 transition-colors ${i !== transactions.length - 1 ? '' : ''}`}>
+                        <div
+                            key={tx.id}
+                            onClick={() => setEditingTransaction(tx)}
+                            className={`p-4 flex justify-between items-center rounded-2xl active:bg-gray-50 hover:bg-gray-50 transition-colors cursor-pointer ${i !== transactions.length - 1 ? '' : ''}`}
+                        >
                             <div className="flex items-center gap-4">
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'income' ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-600'
                                     }`}>
@@ -77,16 +89,27 @@ export default function Dashboard() {
                                 </div>
                                 <div>
                                     <p className="font-bold text-gray-900 text-sm">{tx.note || 'Položka'}</p>
-                                    <p className="text-[10px] font-medium text-gray-400 mt-0.5">{new Date(tx.date).toLocaleDateString()}</p>
+                                    <p className="text-[10px] font-medium text-gray-400 mt-0.5">
+                                        {getCategoryName(tx.categoryId)} • {new Date(tx.date).toLocaleDateString()}
+                                    </p>
                                 </div>
                             </div>
                             <span className={`font-bold tabular-nums text-sm tracking-tight ${tx.type === 'expense' ? 'text-gray-900' : 'text-green-600'}`}>
-                                {tx.type === 'expense' ? '-' : '+'}{tx.amount}
+                                {tx.type === 'expense' ? '-' : '+'}{tx.amount.toLocaleString('cs-CZ')}
                             </span>
                         </div>
                     ))}
                 </div>
             </div>
+
+            {/* Edit Transaction Modal */}
+            {editingTransaction && (
+                <AddTransactionModal
+                    isOpen={!!editingTransaction}
+                    onClose={() => setEditingTransaction(null)}
+                    editTransaction={editingTransaction}
+                />
+            )}
         </div>
     );
 }

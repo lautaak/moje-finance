@@ -3,7 +3,7 @@ import { db } from '../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { X, Check } from 'lucide-react';
 
-export default function AddTransactionModal({ isOpen, onClose }) {
+export default function AddTransactionModal({ isOpen, onClose, editTransaction = null }) {
     const [type, setType] = useState('expense');
     const [amount, setAmount] = useState('');
     const [note, setNote] = useState('');
@@ -15,17 +15,32 @@ export default function AddTransactionModal({ isOpen, onClose }) {
     const categories = useLiveQuery(() => db.categories.toArray());
     const accounts = useLiveQuery(() => db.accounts.toArray());
 
-    // Set defaults when data loads
+    // Set defaults when data loads OR when editing
     useEffect(() => {
-        if (accounts && accounts.length > 0 && !accountId) {
-            setAccountId(accounts[0].id);
+        if (editTransaction) {
+            // Pre-fill form with existing transaction data
+            setType(editTransaction.type);
+            setAmount(editTransaction.amount.toString());
+            setNote(editTransaction.note || '');
+            setCategoryId(editTransaction.categoryId);
+            setAccountId(editTransaction.accountId);
+            setDate(new Date(editTransaction.date).toISOString().split('T')[0]);
+        } else {
+            // Reset for new transaction
+            setType('expense');
+            setAmount('');
+            setNote('');
+            setDate(new Date().toISOString().split('T')[0]);
+
+            if (accounts && accounts.length > 0 && !accountId) {
+                setAccountId(accounts[0].id);
+            }
+            if (categories && categories.length > 0 && !categoryId) {
+                const defaultCat = categories.find(c => c.type === type) || categories[0];
+                setCategoryId(defaultCat.id);
+            }
         }
-        if (categories && categories.length > 0 && !categoryId) {
-            // Try to find a default based on type
-            const defaultCat = categories.find(c => c.type === type) || categories[0];
-            setCategoryId(defaultCat.id);
-        }
-    }, [accounts, categories, type]);
+    }, [accounts, categories, type, editTransaction]);
 
     if (!isOpen) return null;
 
@@ -33,28 +48,79 @@ export default function AddTransactionModal({ isOpen, onClose }) {
         e.preventDefault();
         if (!amount || !categoryId || !accountId) return;
 
-        await db.transactions.add({
-            type,
-            amount: parseFloat(amount),
-            categoryId: parseInt(categoryId),
-            accountId: parseInt(accountId),
-            date: new Date(date),
-            note
-        });
+        if (editTransaction) {
+            // Update existing transaction
+            const oldTx = editTransaction;
+            const oldAccount = await db.accounts.get(parseInt(oldTx.accountId));
+            const newAccount = await db.accounts.get(parseInt(accountId));
 
-        // Update account balance
-        const account = await db.accounts.get(parseInt(accountId));
-        if (account) {
-            const newBalance = type === 'income'
-                ? account.balance + parseFloat(amount)
-                : account.balance - parseFloat(amount);
+            // Reverse old transaction effect
+            if (oldAccount) {
+                const reversedBalance = oldTx.type === 'income'
+                    ? oldAccount.balance - oldTx.amount
+                    : oldAccount.balance + oldTx.amount;
+                await db.accounts.update(parseInt(oldTx.accountId), { balance: reversedBalance });
+            }
 
-            await db.accounts.update(parseInt(accountId), { balance: newBalance });
+            // Apply new transaction effect
+            if (newAccount) {
+                const newBalance = type === 'income'
+                    ? newAccount.balance + parseFloat(amount)
+                    : newAccount.balance - parseFloat(amount);
+                await db.accounts.update(parseInt(accountId), { balance: newBalance });
+            }
+
+            // Update transaction
+            await db.transactions.update(editTransaction.id, {
+                type,
+                amount: parseFloat(amount),
+                categoryId: parseInt(categoryId),
+                accountId: parseInt(accountId),
+                date: new Date(date),
+                note
+            });
+        } else {
+            // Add new transaction
+            await db.transactions.add({
+                type,
+                amount: parseFloat(amount),
+                categoryId: parseInt(categoryId),
+                accountId: parseInt(accountId),
+                date: new Date(date),
+                note
+            });
+
+            // Update account balance
+            const account = await db.accounts.get(parseInt(accountId));
+            if (account) {
+                const newBalance = type === 'income'
+                    ? account.balance + parseFloat(amount)
+                    : account.balance - parseFloat(amount);
+
+                await db.accounts.update(parseInt(accountId), { balance: newBalance });
+            }
         }
 
         // Reset and close
         setAmount('');
         setNote('');
+        onClose();
+    };
+
+    const handleDelete = async () => {
+        if (!editTransaction || !confirm('Opravdu chcete smazat tuto transakci?')) return;
+
+        // Reverse transaction effect on account
+        const account = await db.accounts.get(parseInt(editTransaction.accountId));
+        if (account) {
+            const newBalance = editTransaction.type === 'income'
+                ? account.balance - editTransaction.amount
+                : account.balance + editTransaction.amount;
+            await db.accounts.update(parseInt(editTransaction.accountId), { balance: newBalance });
+        }
+
+        // Delete transaction
+        await db.transactions.delete(editTransaction.id);
         onClose();
     };
 
@@ -64,7 +130,7 @@ export default function AddTransactionModal({ isOpen, onClose }) {
 
                 {/* Header */}
                 <div className="flex justify-between items-center p-4 border-b border-gray-100">
-                    <h2 className="text-lg font-bold text-gray-900">Nová transakce</h2>
+                    <h2 className="text-lg font-bold text-gray-900">{editTransaction ? 'Upravit transakci' : 'Nová transakce'}</h2>
                     <button onClick={onClose} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
                         <X size={20} className="text-gray-500" />
                     </button>
@@ -172,14 +238,25 @@ export default function AddTransactionModal({ isOpen, onClose }) {
                     </div>
 
                     {/* Submit Button */}
-                    <button
-                        type="submit"
-                        className={`w-full py-4 rounded-xl flex items-center justify-center gap-2 text-white font-bold text-lg shadow-lg hover:brightness-110 active:scale-[0.98] transition-all ${type === 'expense' ? 'bg-red-500 shadow-red-500/30' : 'bg-green-500 shadow-green-500/30'
-                            }`}
-                    >
-                        <Check size={24} />
-                        Uložit {type === 'expense' ? 'výdaj' : 'příjem'}
-                    </button>
+                    <div className="flex gap-2">
+                        {editTransaction && (
+                            <button
+                                type="button"
+                                onClick={handleDelete}
+                                className="px-6 py-4 rounded-xl flex items-center justify-center gap-2 text-white font-bold text-lg bg-red-500 shadow-lg shadow-red-500/30 hover:brightness-110 active:scale-[0.98] transition-all"
+                            >
+                                Smazat
+                            </button>
+                        )}
+                        <button
+                            type="submit"
+                            className={`flex-1 py-4 rounded-xl flex items-center justify-center gap-2 text-white font-bold text-lg shadow-lg hover:brightness-110 active:scale-[0.98] transition-all ${type === 'expense' ? 'bg-red-500 shadow-red-500/30' : 'bg-green-500 shadow-green-500/30'
+                                }`}
+                        >
+                            <Check size={24} />
+                            {editTransaction ? 'Uložit změny' : `Uložit ${type === 'expense' ? 'výdaj' : 'příjem'}`}
+                        </button>
+                    </div>
 
                 </form>
             </div>
