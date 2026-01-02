@@ -10,6 +10,9 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
     const [categoryId, setCategoryId] = useState('');
     const [accountId, setAccountId] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [isRecurring, setIsRecurring] = useState(false);
+    const [recurringFrequency, setRecurringFrequency] = useState('monthly');
+    const [recurringDay, setRecurringDay] = useState(1);
 
     // Load data for selects
     const categories = useLiveQuery(() => db.categories.toArray());
@@ -25,12 +28,16 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
             setCategoryId(editTransaction.categoryId);
             setAccountId(editTransaction.accountId);
             setDate(new Date(editTransaction.date).toISOString().split('T')[0]);
+            setIsRecurring(false); // Editing doesn't support recurring yet
         } else {
             // Reset for new transaction
             setType('expense');
             setAmount('');
             setNote('');
             setDate(new Date().toISOString().split('T')[0]);
+            setIsRecurring(false);
+            setRecurringFrequency('monthly');
+            setRecurringDay(1);
 
             if (accounts && accounts.length > 0 && !accountId) {
                 setAccountId(accounts[0].id);
@@ -49,12 +56,11 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
         if (!amount || !categoryId || !accountId) return;
 
         if (editTransaction) {
-            // Update existing transaction
+            // Update existing transaction (same as before)
             const oldTx = editTransaction;
             const oldAccount = await db.accounts.get(parseInt(oldTx.accountId));
             const newAccount = await db.accounts.get(parseInt(accountId));
 
-            // Reverse old transaction effect
             if (oldAccount) {
                 const reversedBalance = oldTx.type === 'income'
                     ? oldAccount.balance - oldTx.amount
@@ -62,7 +68,6 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                 await db.accounts.update(parseInt(oldTx.accountId), { balance: reversedBalance });
             }
 
-            // Apply new transaction effect
             if (newAccount) {
                 const newBalance = type === 'income'
                     ? newAccount.balance + parseFloat(amount)
@@ -70,7 +75,6 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                 await db.accounts.update(parseInt(accountId), { balance: newBalance });
             }
 
-            // Update transaction
             await db.transactions.update(editTransaction.id, {
                 type,
                 amount: parseFloat(amount),
@@ -96,14 +100,30 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                 const newBalance = type === 'income'
                     ? account.balance + parseFloat(amount)
                     : account.balance - parseFloat(amount);
-
                 await db.accounts.update(parseInt(accountId), { balance: newBalance });
+            }
+
+            // If recurring, create recurring transaction template
+            if (isRecurring) {
+                await db.recurringTransactions.add({
+                    type,
+                    amount: parseFloat(amount),
+                    categoryId: parseInt(categoryId),
+                    accountId: parseInt(accountId),
+                    note,
+                    frequency: recurringFrequency,
+                    dayOfMonth: recurringFrequency === 'monthly' ? parseInt(recurringDay) : null,
+                    dayOfWeek: recurringFrequency === 'weekly' ? parseInt(recurringDay) : null,
+                    isActive: true,
+                    lastProcessed: new Date()
+                });
             }
         }
 
         // Reset and close
         setAmount('');
         setNote('');
+        setIsRecurring(false);
         onClose();
     };
 
@@ -224,6 +244,70 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                             ))}
                         </select>
                     </div>
+
+                    {/* Recurring Options */}
+                    {!editTransaction && (
+                        <div className="border-t border-gray-100 pt-4 space-y-3">
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={isRecurring}
+                                    onChange={(e) => setIsRecurring(e.target.checked)}
+                                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                                />
+                                <span className="font-semibold text-gray-900">Opakující se transakce</span>
+                            </label>
+
+                            {isRecurring && (
+                                <div className="pl-8 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-500 mb-1">Frekvence</label>
+                                            <select
+                                                value={recurringFrequency}
+                                                onChange={(e) => setRecurringFrequency(e.target.value)}
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                                            >
+                                                <option value="weekly">Týdně</option>
+                                                <option value="monthly">Měsíčně</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-gray-500 mb-1">
+                                                {recurringFrequency === 'weekly' ? 'Den v týdnu' : 'Den v měsíci'}
+                                            </label>
+                                            <select
+                                                value={recurringDay}
+                                                onChange={(e) => setRecurringDay(e.target.value)}
+                                                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                                            >
+                                                {recurringFrequency === 'weekly' ? (
+                                                    <>
+                                                        <option value="1">Pondělí</option>
+                                                        <option value="2">Úterý</option>
+                                                        <option value="3">Středa</option>
+                                                        <option value="4">Čtvrtek</option>
+                                                        <option value="5">Pátek</option>
+                                                        <option value="6">Sobota</option>
+                                                        <option value="0">Neděle</option>
+                                                    </>
+                                                ) : (
+                                                    Array.from({ length: 31 }, (_, i) => (
+                                                        <option key={i + 1} value={i + 1}>{i + 1}.</option>
+                                                    ))
+                                                )}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-gray-500">
+                                        {recurringFrequency === 'weekly'
+                                            ? 'Transakce se automaticky vytvoří každý týden.'
+                                            : 'Transakce se automaticky vytvoří každý měsíc.'}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Note */}
                     <div>

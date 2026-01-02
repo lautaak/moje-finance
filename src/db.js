@@ -3,10 +3,19 @@ import Dexie from 'dexie';
 export const db = new Dexie('FinanceAppDB');
 
 db.version(1).stores({
-    transactions: '++id, date, type, categoryId, accountId', // Indexes
+    transactions: '++id, date, type, categoryId, accountId',
     categories: '++id, name, parentId',
     accounts: '++id, name',
     budgets: '++id, categoryId, month'
+});
+
+// Version 2: Add recurring transactions
+db.version(2).stores({
+    transactions: '++id, date, type, categoryId, accountId',
+    categories: '++id, name, parentId',
+    accounts: '++id, name',
+    budgets: '++id, categoryId, month',
+    recurringTransactions: '++id, dayOfMonth, isActive'
 });
 
 // Pre-populate default categories if empty
