@@ -5,33 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import AddTransactionModal from '../components/AddTransactionModal';
 
-// Helper to get emoji for category based on its icon name
-const getCategoryEmoji = (iconName) => {
-    const emojis = {
-        'Utensils': '🍔',
-        'Home': '🏠',
-        'Car': '🚗',
-        'Gamepad2': '🎮',
-        'Banknote': '💰',
-        'ShoppingBag': '🛍️',
-        'Coffee': '☕',
-        'Smartphone': '📱',
-        'Gift': '🎁',
-        'Heart': '❤️',
-        'Briefcase': '💼',
-        'Zap': '⚡',
-        'Bus': '🚌',
-        'Plane': '✈️',
-        'CreditCard': '💳',
-        'Wallet': '👛',
-        'TrendingUp': '📈',
-        'TrendingDown': '📉',
-        'ShoppingCard': '🛒',
-        'Target': '🎯',
-        'Settings': '⚙️'
-    };
-    return emojis[iconName] || '💸';
-};
+// Categories are now self-contained with emojis stored in DB
 
 export default function Dashboard() {
     const [editingTransaction, setEditingTransaction] = useState(null);
@@ -42,11 +16,10 @@ export default function Dashboard() {
     const totalBalance = accounts?.reduce((acc, account) => acc + account.balance, 0) || 0;
 
     const getCategoryInfo = (categoryId) => {
-        // Use loose equality or Number cast for robustness
         const category = categories?.find(c => Number(c.id) === Number(categoryId));
         return {
             name: category?.name || 'Bez kategorie',
-            emoji: getCategoryEmoji(category?.icon)
+            emoji: category?.emoji || '💸'
         };
     };
 

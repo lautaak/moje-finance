@@ -21,11 +21,11 @@ db.version(2).stores({
 // Pre-populate default categories if empty
 db.on('populate', () => {
     db.categories.bulkAdd([
-        { name: 'Jídlo', icon: 'Utensils', color: '#ef4444' },
-        { name: 'Bydlení', icon: 'Home', color: '#3b82f6' },
-        { name: 'Doprava', icon: 'Car', color: '#f59e0b' },
-        { name: 'Zábava', icon: 'Gamepad2', color: '#8b5cf6' },
-        { name: 'Mzda', icon: 'Banknote', color: '#10b981', type: 'income' },
+        { name: 'Jídlo', icon: 'Utensils', emoji: '🍔', color: '#ef4444' },
+        { name: 'Bydlení', icon: 'Home', emoji: '🏠', color: '#3b82f6' },
+        { name: 'Doprava', icon: 'Car', emoji: '🚗', color: '#f59e0b' },
+        { name: 'Zábava', icon: 'Gamepad2', emoji: '🎮', color: '#8b5cf6' },
+        { name: 'Mzda', icon: 'Banknote', emoji: '💰', color: '#10b981', type: 'income' },
     ]);
 
     db.accounts.bulkAdd([

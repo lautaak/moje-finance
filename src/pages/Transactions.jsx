@@ -70,29 +70,23 @@ export default function Transactions() {
                                     className="p-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
                                 >
                                     <div className="flex items-center gap-4">
-                                        {/* Icon Circle */}
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'income' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {tx.type === 'income'
-                                                ? <ArrowUpRight size={20} />
-                                                : <ArrowDownLeft size={20} />
-                                            }
+                                        {/* Icon/Emoji Circle */}
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-inner-soft bg-gray-50`}>
+                                            {category?.emoji || '💸'}
                                         </div>
 
                                         <div className="flex flex-col">
-                                            <span className="font-medium text-gray-900">
+                                            <span className="font-bold text-gray-900 leading-tight">
                                                 {tx.note || category?.name || 'Bez názvu'}
                                             </span>
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 mt-0.5">
                                                 {category && (
-                                                    <span
-                                                        className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                                                        style={{ backgroundColor: `${category.color}20`, color: category.color }}
-                                                    >
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/70">
                                                         {category.name}
                                                     </span>
                                                 )}
-                                                <span className="text-xs text-gray-400">
+                                                <span className="w-1 h-1 rounded-full bg-gray-200"></span>
+                                                <span className="text-[10px] font-bold text-gray-300">
                                                     {format(tx.date, 'HH:mm')}
                                                 </span>
                                             </div>
