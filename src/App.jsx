@@ -16,7 +16,7 @@ const NavItem = ({ to, icon: Icon, label }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
-      `flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`
+      `flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600'}`
     }
   >
     <Icon size={24} />
@@ -58,11 +58,11 @@ function App() {
         {/* Update Notification Toast */}
         {needRefresh && (
           <div className="fixed top-4 left-4 right-4 z-[100] animate-in slide-in-from-top-2">
-            <div className="bg-blue-600 text-white p-4 rounded-2xl shadow-xl flex justify-between items-center">
+            <div className="bg-primary text-white p-4 rounded-2xl shadow-xl flex justify-between items-center">
               <span className="font-medium text-sm">Je dostupná nová verze!</span>
               <button
                 onClick={() => updateServiceWorker(true)}
-                className="bg-white text-blue-600 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                className="bg-white text-primary px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2"
               >
                 <RefreshCw size={14} className="animate-spin-slow" />
                 Aktualizovat
@@ -93,7 +93,7 @@ function App() {
             <div className="relative -top-6">
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="bg-blue-600 text-white p-4 rounded-full shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-transform active:scale-95 flex items-center justify-center"
+                className="bg-primary text-white p-4 rounded-full shadow-lg shadow-primary/30 hover:bg-primary-dark transition-transform active:scale-95 flex items-center justify-center"
                 aria-label="Přidat transakci"
               >
                 <PlusCircle size={32} strokeWidth={2.5} />

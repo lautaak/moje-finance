@@ -68,14 +68,14 @@ export default function ComparisonChart({ transactions, categories }) {
             <div className="flex justify-center bg-gray-50 p-1 rounded-lg w-max mx-auto">
                 <button
                     onClick={() => setTimeScale('month')}
-                    className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${timeScale === 'month' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'
+                    className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${timeScale === 'month' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-900'
                         }`}
                 >
                     Po měsících
                 </button>
                 <button
                     onClick={() => setTimeScale('year')}
-                    className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${timeScale === 'year' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'
+                    className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all ${timeScale === 'year' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-900'
                         }`}
                 >
                     Po letech
@@ -126,8 +126,8 @@ export default function ComparisonChart({ transactions, categories }) {
                                 key={cat.id}
                                 onClick={() => toggleCategory(cat.id)}
                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${isHidden
-                                        ? 'bg-gray-100 text-gray-400 opacity-50'
-                                        : 'bg-gray-50 text-gray-900 ring-1 ring-inset ring-gray-200'
+                                    ? 'bg-gray-100 text-gray-400 opacity-50'
+                                    : 'bg-gray-50 text-gray-900 ring-1 ring-inset ring-gray-200'
                                     }`}
                             >
                                 <span className={`w-2 h-2 rounded-full ${isHidden ? 'bg-gray-400' : ''}`} style={!isHidden ? { background: cat.color } : {}} />

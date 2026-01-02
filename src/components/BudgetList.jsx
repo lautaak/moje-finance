@@ -61,20 +61,20 @@ export default function BudgetList() {
             {!isAdding ? (
                 <button
                     onClick={() => setIsAdding(true)}
-                    className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 font-medium hover:border-blue-500 hover:text-blue-500 transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 font-medium hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
                 >
                     <Plus size={20} />
                     Nastavit rozpočet
                 </button>
             ) : (
-                <div className="bg-white p-4 rounded-xl border border-blue-100 shadow-sm space-y-3">
+                <div className="bg-white p-4 rounded-xl border border-primary/20 shadow-sm space-y-3">
                     <h3 className="font-semibold text-gray-900">Nový rozpočet</h3>
                     <div>
                         <label className="text-xs text-gray-500 block mb-1">Kategorie</label>
                         <select
                             value={newBudgetCategory}
                             onChange={e => setNewBudgetCategory(e.target.value)}
-                            className="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                            className="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary transition-colors"
                         >
                             <option value="">Vyberte kategorii</option>
                             {categories.map(c => (
@@ -89,12 +89,12 @@ export default function BudgetList() {
                             value={newBudgetAmount}
                             onChange={e => setNewBudgetAmount(e.target.value)}
                             placeholder="5000"
-                            className="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                            className="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary transition-colors"
                         />
                     </div>
                     <div className="flex gap-2 pt-2">
                         <button onClick={() => setIsAdding(false)} className="flex-1 py-2 text-sm text-gray-500 bg-gray-100 rounded-lg">Zrušit</button>
-                        <button onClick={handleSaveBudget} className="flex-1 py-2 text-sm text-white bg-blue-600 rounded-lg font-medium shadow-sm shadow-blue-500/30">Uložit</button>
+                        <button onClick={handleSaveBudget} className="flex-1 py-2 text-sm text-white bg-primary rounded-lg font-medium shadow-sm shadow-primary/30">Uložit</button>
                     </div>
                 </div>
             )}
