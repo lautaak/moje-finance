@@ -1,11 +1,18 @@
 // Theme colors configuration - Modern, high-contrast, premium palettes
 export const themes = {
+    titanium: {
+        name: 'Titanová',
+        primary: '#4b5563', // gray-600
+        primaryDark: '#1f2937', // gray-800
+        primaryLight: '#9ca3af', // gray-400
+        gradient: 'from-gray-600 to-slate-800'
+    },
     blue: {
-        name: 'Královská',
-        primary: '#4f46e5', // indigo-600 (richer than default blue)
-        primaryDark: '#3730a3', // indigo-800
-        primaryLight: '#818cf8', // indigo-400
-        gradient: 'from-indigo-600 to-blue-700'
+        name: 'Fialová',
+        primary: '#6366f1', // indigo-500
+        primaryDark: '#4338ca', // indigo-700
+        primaryLight: '#a5b4fc', // indigo-300
+        gradient: 'from-indigo-600 to-violet-700'
     },
     ocean: {
         name: 'Oceán',
@@ -34,13 +41,6 @@ export const themes = {
         primaryDark: '#5b21b6', // violet-800
         primaryLight: '#c4b5fd', // violet-300
         gradient: 'from-violet-600 to-fuchsia-700'
-    },
-    amber: {
-        name: 'Amber',
-        primary: '#f59e0b', // amber-500
-        primaryDark: '#92400e', // amber-800
-        primaryLight: '#fcd34d', // amber-300
-        gradient: 'from-amber-500 to-orange-600'
     }
 };
 
