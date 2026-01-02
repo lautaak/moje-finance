@@ -1,4 +1,4 @@
-import { db } from './db';
+import { db } from '../db';
 
 // Process recurring transactions
 export async function processRecurringTransactions() {
