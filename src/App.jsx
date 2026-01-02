@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, NavLink } from 'react-router-dom';
 import { Home, List, PieChart, PlusCircle, Settings, RefreshCw } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
@@ -7,6 +7,7 @@ import Analytics from './pages/Analytics';
 import SettingsPage from './pages/Settings';
 import AddTransactionModal from './components/AddTransactionModal';
 import { useRegisterSW } from 'virtual:pwa-register/react';
+import { processRecurringTransactions } from './services/recurringService';
 
 
 // Components
@@ -24,6 +25,13 @@ const NavItem = ({ to, icon: Icon, label }) => (
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Process recurring transactions on app load
+  useEffect(() => {
+    processRecurringTransactions().catch(err => {
+      console.error('Error processing recurring transactions:', err);
+    });
+  }, []);
 
   // PWA Update Logic
   const {
