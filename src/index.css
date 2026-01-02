@@ -8,16 +8,6 @@ html {
   font-size: 16px;
 }
 
-/* AGGRESSIVE MOBILE FIX - Scale everything up by 50% */
-@media (max-width: 640px) {
-  body {
-    transform: scale(1.5);
-    transform-origin: top left;
-    width: 66.67%;
-    /* Compensate for scale */
-  }
-}
-
 body {
   @apply bg-gray-50 text-gray-900;
   margin: 0;
