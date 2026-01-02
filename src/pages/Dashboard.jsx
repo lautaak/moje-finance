@@ -4,6 +4,7 @@ import { ArrowUpRight, ArrowDownLeft, Wallet } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import AddTransactionModal from '../components/AddTransactionModal';
+import CategoryIcon from '../components/CategoryIcon';
 
 // Categories are now self-contained with emojis stored in DB
 
@@ -19,7 +20,8 @@ export default function Dashboard() {
         const category = categories?.find(c => Number(c.id) === Number(categoryId));
         return {
             name: category?.name || 'Bez kategorie',
-            emoji: category?.emoji || '💸'
+            icon: category?.icon || 'HelpCircle',
+            color: category?.color || '#94a3b8'
         };
     };
 
@@ -67,8 +69,9 @@ export default function Dashboard() {
                                 className="p-6 flex justify-between items-center active:bg-gray-50/50 transition-all cursor-pointer group"
                             >
                                 <div className="flex items-center gap-5">
-                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-inner-soft bg-gray-50 group-hover:scale-105 transition-transform`}>
-                                        {info.emoji}
+                                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner-soft transition-transform group-hover:scale-105"
+                                        style={{ backgroundColor: `${info.color}15`, color: info.color }}>
+                                        <CategoryIcon iconName={info.icon} size={24} strokeWidth={2.5} />
                                     </div>
                                     <div>
                                         <p className="font-black text-gray-900 text-[16px] leading-tight mb-1">{tx.note || 'Bezejmenná'}</p>

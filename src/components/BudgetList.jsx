@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
+import CategoryIcon from './CategoryIcon';
 import { Plus, Trash2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function BudgetList() {
@@ -117,7 +118,9 @@ export default function BudgetList() {
                         <div key={budget.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
                             <div className="flex justify-between items-start mb-2">
                                 <div className="flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full" style={{ background: category.color }} />
+                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm" style={{ backgroundColor: `${category?.color || '#94a3b8'}15`, color: category?.color || '#94a3b8' }}>
+                                        <CategoryIcon iconName={category?.icon} size={16} strokeWidth={2.5} />
+                                    </div>
                                     <span className="font-bold text-gray-900">{category.name}</span>
                                 </div>
                                 <button onClick={() => deleteBudget(budget.id)} className="text-gray-300 hover:text-red-500 transition-colors">

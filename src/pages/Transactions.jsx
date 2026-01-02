@@ -6,6 +6,7 @@ import { format, isToday, isYesterday } from 'date-fns';
 import { cs } from 'date-fns/locale';
 import { ArrowUpRight, ArrowDownLeft, Calendar } from 'lucide-react';
 import AddTransactionModal from '../components/AddTransactionModal';
+import CategoryIcon from '../components/CategoryIcon';
 
 export default function Transactions() {
     const [editingTransaction, setEditingTransaction] = useState(null);
@@ -70,9 +71,10 @@ export default function Transactions() {
                                     className="p-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
                                 >
                                     <div className="flex items-center gap-4">
-                                        {/* Icon/Emoji Circle */}
-                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-inner-soft bg-gray-50`}>
-                                            {category?.emoji || '💸'}
+                                        {/* Icon Circle */}
+                                        <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-inner-soft"
+                                            style={{ backgroundColor: `${category?.color || '#94a3b8'}15`, color: category?.color || '#94a3b8' }}>
+                                            <CategoryIcon iconName={category?.icon} size={22} strokeWidth={2.5} />
                                         </div>
 
                                         <div className="flex flex-col">

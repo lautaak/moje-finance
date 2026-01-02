@@ -8,27 +8,7 @@ import {
     Utensils, Zap, Bus, Plane
 } from 'lucide-react';
 
-// Icon mapping for selection
-const ICON_MAP = {
-    ShoppingBag, Coffee, Car, Home,
-    Smartphone, Gift, Heart, Briefcase,
-    Utensils, Zap, Bus, Plane
-};
-
-const EMOJI_MAP = {
-    'ShoppingBag': '🛍️',
-    'Coffee': '☕',
-    'Car': '🚗',
-    'Home': '🏠',
-    'Smartphone': '📱',
-    'Gift': '🎁',
-    'Heart': '❤️',
-    'Briefcase': '💼',
-    'Utensils': '🍔',
-    'Zap': '⚡',
-    'Bus': '🚌',
-    'Plane': '✈️'
-};
+import { ICON_MAP } from './CategoryIcon';
 
 export default function CategorySettings() {
     const categories = useLiveQuery(() => db.categories.toArray());
@@ -48,25 +28,11 @@ export default function CategorySettings() {
         await db.categories.add({
             name: newCatName,
             color: newCatColor,
-            icon: newCatIcon,
-            emoji: EMOJI_MAP[newCatIcon] || '💸'
+            icon: newCatIcon
         });
         setNewCatName('');
         setIsAdding(false);
     };
-
-    // Migration/Fix: Ensure all categories have emojis
-    React.useEffect(() => {
-        if (categories) {
-            categories.forEach(async (cat) => {
-                if (!cat.emoji) {
-                    await db.categories.update(cat.id, {
-                        emoji: EMOJI_MAP[cat.icon] || '💸'
-                    });
-                }
-            });
-        }
-    }, [categories]);
 
     if (!categories) return null;
 
@@ -133,13 +99,10 @@ export default function CategorySettings() {
                         <div key={cat.id} className="flex items-center justify-between p-3 hover:bg-gray-50">
                             <div className="flex items-center gap-3">
                                 <div
-                                    className="w-8 h-8 rounded-full flex items-center justify-center text-white relative"
+                                    className="w-8 h-8 rounded-full flex items-center justify-center text-white"
                                     style={{ backgroundColor: cat.color }}
                                 >
                                     <Icon size={16} />
-                                    <span className="absolute -bottom-1 -right-1 text-[10px] bg-white rounded-full w-4 h-4 flex items-center justify-center shadow-sm">
-                                        {cat.emoji || EMOJI_MAP[cat.icon] || '💸'}
-                                    </span>
                                 </div>
                                 <span className="font-medium text-gray-900">{cat.name}</span>
                             </div>
