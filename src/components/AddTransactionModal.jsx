@@ -53,95 +53,118 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!amount || !categoryId || !accountId) return;
 
-        if (editTransaction) {
-            // Update existing transaction (same as before)
-            const oldTx = editTransaction;
-            const oldAccount = await db.accounts.get(parseInt(oldTx.accountId));
-            const newAccount = await db.accounts.get(parseInt(accountId));
-
-            if (oldAccount) {
-                const reversedBalance = oldTx.type === 'income'
-                    ? oldAccount.balance - oldTx.amount
-                    : oldAccount.balance + oldTx.amount;
-                await db.accounts.update(parseInt(oldTx.accountId), { balance: reversedBalance });
-            }
-
-            if (newAccount) {
-                const newBalance = type === 'income'
-                    ? newAccount.balance + parseFloat(amount)
-                    : newAccount.balance - parseFloat(amount);
-                await db.accounts.update(parseInt(accountId), { balance: newBalance });
-            }
-
-            await db.transactions.update(editTransaction.id, {
-                type,
-                amount: parseFloat(amount),
-                categoryId: parseInt(categoryId),
-                accountId: parseInt(accountId),
-                date: new Date(date),
-                note
-            });
-        } else {
-            // Add new transaction
-            await db.transactions.add({
-                type,
-                amount: parseFloat(amount),
-                categoryId: parseInt(categoryId),
-                accountId: parseInt(accountId),
-                date: new Date(date),
-                note
-            });
-
-            // Update account balance
-            const account = await db.accounts.get(parseInt(accountId));
-            if (account) {
-                const newBalance = type === 'income'
-                    ? account.balance + parseFloat(amount)
-                    : account.balance - parseFloat(amount);
-                await db.accounts.update(parseInt(accountId), { balance: newBalance });
-            }
-
-            // If recurring, create recurring transaction template
-            if (isRecurring) {
-                await db.recurringTransactions.add({
-                    type,
-                    amount: parseFloat(amount),
-                    categoryId: parseInt(categoryId),
-                    accountId: parseInt(accountId),
-                    note,
-                    frequency: recurringFrequency,
-                    dayOfMonth: recurringFrequency === 'monthly' ? parseInt(recurringDay) : null,
-                    dayOfWeek: recurringFrequency === 'weekly' ? parseInt(recurringDay) : null,
-                    isActive: true,
-                    lastProcessed: new Date()
-                });
-            }
+        // Robust numeric parsing
+        const parsedAmount = parseFloat(amount.toString().replace(/\s/g, '').replace(',', '.'));
+        if (isNaN(parsedAmount) || parsedAmount <= 0) {
+            alert('Zadejte platnou částku.');
+            return;
         }
 
-        // Reset and close
-        setAmount('');
-        setNote('');
-        setIsRecurring(false);
-        onClose();
+        if (!categoryId || !accountId) {
+            alert('Vyberte kategorii a účet.');
+            return;
+        }
+
+        try {
+            if (editTransaction) {
+                // Update existing transaction
+                const oldTx = editTransaction;
+                const oldAccount = await db.accounts.get(Number(oldTx.accountId));
+                const newAccount = await db.accounts.get(Number(accountId));
+
+                // Reverse old transaction effect
+                if (oldAccount) {
+                    const reversedBalance = oldTx.type === 'income'
+                        ? oldAccount.balance - oldTx.amount
+                        : oldAccount.balance + oldTx.amount;
+                    await db.accounts.update(Number(oldTx.accountId), { balance: reversedBalance });
+                }
+
+                // Apply new transaction effect
+                if (newAccount) {
+                    const freshAccount = await db.accounts.get(Number(accountId)); // Get latest balance
+                    const newBalance = type === 'income'
+                        ? freshAccount.balance + parsedAmount
+                        : freshAccount.balance - parsedAmount;
+                    await db.accounts.update(Number(accountId), { balance: newBalance });
+                }
+
+                await db.transactions.update(editTransaction.id, {
+                    type,
+                    amount: parsedAmount,
+                    categoryId: Number(categoryId),
+                    accountId: Number(accountId),
+                    date: new Date(date),
+                    note
+                });
+            } else {
+                // Add new transaction
+                await db.transactions.add({
+                    type,
+                    amount: parsedAmount,
+                    categoryId: Number(categoryId),
+                    accountId: Number(accountId),
+                    date: new Date(date),
+                    note
+                });
+
+                // Update account balance
+                const account = await db.accounts.get(Number(accountId));
+                if (account) {
+                    const newBalance = type === 'income'
+                        ? account.balance + parsedAmount
+                        : account.balance - parsedAmount;
+                    await db.accounts.update(Number(accountId), { balance: newBalance });
+                }
+
+                // If recurring, create recurring transaction template
+                if (isRecurring) {
+                    await db.recurringTransactions.add({
+                        type,
+                        amount: parsedAmount,
+                        categoryId: Number(categoryId),
+                        accountId: Number(accountId),
+                        note,
+                        frequency: recurringFrequency,
+                        dayOfMonth: recurringFrequency === 'monthly' ? Number(recurringDay) : null,
+                        dayOfWeek: recurringFrequency === 'weekly' ? Number(recurringDay) : null,
+                        isActive: true,
+                        lastProcessed: new Date()
+                    });
+                }
+            }
+
+            // Reset and close
+            setAmount('');
+            setNote('');
+            setIsRecurring(false);
+            onClose();
+        } catch (err) {
+            console.error('Error saving transaction:', err);
+            alert('Chyba při ukládání transakce.');
+        }
     };
 
     const handleDelete = async () => {
         if (!editTransaction || !confirm('Opravdu chcete smazat tuto transakci?')) return;
 
-        // Reverse transaction effect on account
-        const account = await db.accounts.get(parseInt(editTransaction.accountId));
-        if (account) {
-            const newBalance = editTransaction.type === 'income'
-                ? account.balance - editTransaction.amount
-                : account.balance + editTransaction.amount;
-            await db.accounts.update(parseInt(editTransaction.accountId), { balance: newBalance });
-        }
+        try {
+            // Reverse transaction effect on account
+            const account = await db.accounts.get(Number(editTransaction.accountId));
+            if (account) {
+                const newBalance = editTransaction.type === 'income'
+                    ? account.balance - editTransaction.amount
+                    : account.balance + editTransaction.amount;
+                await db.accounts.update(Number(editTransaction.accountId), { balance: newBalance });
+            }
 
-        // Delete transaction
-        await db.transactions.delete(editTransaction.id);
-        onClose();
+            // Delete transaction
+            await db.transactions.delete(editTransaction.id);
+            onClose();
+        } catch (err) {
+            console.error('Error deleting transaction:', err);
+        }
     };
 
     return (

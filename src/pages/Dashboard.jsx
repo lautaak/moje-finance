@@ -57,7 +57,6 @@ export default function Dashboard() {
             <header className="flex justify-between items-center py-4">
                 <div>
                     <h1 className="text-4xl font-black text-gray-900 tracking-tighter">Přehled</h1>
-                    <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mt-1">Dobrý den!</p>
                 </div>
             </header>
 
