@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import {
-    Plus, Trash2, X, Check,
+    Check,
     ShoppingBag, Coffee, Car, Home,
     Smartphone, Gift, Heart, Briefcase,
-    Utensils, Zap, Bus, Plane
+    Utensils, Zap, Bus, Plane, Palette
 } from 'lucide-react';
 
 import { ICON_MAP } from './CategoryIcon';
@@ -39,12 +39,12 @@ export default function CategorySettings() {
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center px-1">
-                <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider opacity-60">Kategorie</h2>
+                <h2 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em] opacity-40">Kategorie</h2>
                 <button
                     onClick={() => setIsAdding(true)}
-                    className="text-blue-600 text-xs font-semibold hover:text-blue-700 flex items-center gap-1"
+                    className="bg-primary/10 text-primary px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-primary/20 transition-all flex items-center gap-2"
                 >
-                    <Plus size={14} /> Přidat
+                    <Plus size={14} strokeWidth={3} /> Přidat
                 </button>
             </div>
 
@@ -77,16 +77,47 @@ export default function CategorySettings() {
                             })}
                         </div>
 
-                        <div className="flex gap-2">
-                            <input
-                                type="color"
-                                value={newCatColor}
-                                onChange={e => setNewCatColor(e.target.value)}
-                                className="h-9 w-9 p-0.5 rounded border border-gray-200 cursor-pointer"
-                            />
-                            <button onClick={handleAdd} className="flex-1 bg-blue-600 text-white rounded-lg text-sm font-medium">Uložit</button>
-                            <button onClick={() => setIsAdding(false)} className="px-3 bg-gray-200 text-gray-600 rounded-lg">
-                                <X size={18} />
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Barva</label>
+                            <div className="flex flex-wrap gap-2 px-1">
+                                {[
+                                    '#ef4444', '#f97316', '#f59e0b', '#10b981', '#06b6d4',
+                                    '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#ec4899',
+                                    '#64748b', '#475569', '#1e293b'
+                                ].map(color => (
+                                    <button
+                                        key={color}
+                                        type="button"
+                                        onClick={() => setNewCatColor(color)}
+                                        className={`w-8 h-8 rounded-full border-2 transition-all ${newCatColor === color ? 'border-gray-900 scale-110 shadow-md' : 'border-transparent'}`}
+                                        style={{ backgroundColor: color }}
+                                    />
+                                ))}
+                                {/* Custom Color Picker Trigger */}
+                                <div className="relative group">
+                                    <div
+                                        className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all cursor-pointer overflow-hidden ${!['#ef4444', '#f97316', '#f59e0b', '#10b981', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#64748b', '#475569', '#1e293b'].includes(newCatColor) ? 'border-gray-900 scale-110 shadow-md' : 'border-transparent'}`}
+                                        style={{ backgroundColor: newCatColor }}
+                                    >
+                                        <Palette size={14} className={newCatColor === '#ffffff' ? 'text-gray-900' : 'text-white'} />
+                                        <input
+                                            type="color"
+                                            value={newCatColor}
+                                            onChange={e => setNewCatColor(e.target.value)}
+                                            className="absolute inset-0 opacity-0 cursor-pointer scale-150"
+                                        />
+                                    </div>
+                                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none font-bold uppercase tracking-widest">
+                                        Vlastní
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2 pt-2">
+                            <button onClick={handleAdd} className="flex-1 bg-primary text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/30 hover:brightness-110 transition-all">Uložit kategorii</button>
+                            <button onClick={() => setIsAdding(false)} className="px-4 bg-gray-100 text-gray-500 rounded-xl hover:bg-gray-200 transition-all">
+                                <X size={20} />
                             </button>
                         </div>
                     </div>

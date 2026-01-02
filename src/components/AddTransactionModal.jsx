@@ -44,6 +44,31 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
         }
     }, [accounts, categories, type, editTransaction]);
 
+    // Close modal on navigation
+    useEffect(() => {
+        const handleHashChange = () => {
+            if (isOpen) onClose();
+        };
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, [isOpen, onClose]);
+
+    const formatInputAmount = (val) => {
+        if (!val) return '';
+        // Remove all non-numeric characters except for the decimal point
+        const clean = val.toString().replace(/[^\d.]/g, '');
+        const parts = clean.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        return parts.join('.');
+    };
+
+    const handleAmountChange = (e) => {
+        const val = e.target.value.replace(/\s/g, '');
+        if (val === '' || /^\d*\.?\d*$/.test(val)) {
+            setAmount(val);
+        }
+    };
+
     if (!isOpen) return null;
 
     const handleSubmit = async (e) => {
@@ -210,22 +235,16 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                         <label className="block text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">Částka</label>
                         <div className="relative bg-gray-50 rounded-xl px-4 py-3 ring-2 ring-transparent focus-within:ring-primary transition-all">
                             <input
-                                type="number"
+                                type="text"
                                 inputMode="decimal"
-                                step="any"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
+                                value={formatInputAmount(amount)}
+                                onChange={handleAmountChange}
                                 placeholder="0"
                                 className="w-full text-4xl font-bold text-gray-900 bg-transparent border-none focus:ring-0 focus:outline-none p-0 placeholder-gray-300 pr-16"
                                 autoFocus
                             />
                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-xl">Kč</span>
                         </div>
-                        {amount && !isNaN(parseFloat(amount)) && (
-                            <p className="mt-2 ml-1 text-xs font-bold text-primary/60 uppercase tracking-widest">
-                                Náhled: {parseFloat(amount).toLocaleString('cs-CZ')} Kč
-                            </p>
-                        )}
                     </div>
 
                     {/* Date & Account Row */}
@@ -323,12 +342,12 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
 
                     {/* Note */}
                     <div>
-                        <label className="block text-xs font-semibold text-gray-500 mb-1">Poznámka (volitelné)</label>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1">Název (volitelné)</label>
                         <input
                             type="text"
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
-                            placeholder="Např. Oběd s kolegy"
+                            placeholder=""
                             className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
                         />
                     </div>
@@ -355,7 +374,7 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                     </div>
 
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

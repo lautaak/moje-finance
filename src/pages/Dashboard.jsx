@@ -66,12 +66,12 @@ export default function Dashboard() {
                             <div
                                 key={tx.id}
                                 onClick={() => setEditingTransaction(tx)}
-                                className="p-6 flex justify-between items-center active:bg-gray-50/50 transition-all cursor-pointer group"
+                                className="p-4 flex justify-between items-center active:bg-gray-50/50 transition-all cursor-pointer group"
                             >
-                                <div className="flex items-center gap-5">
-                                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner-soft transition-transform group-hover:scale-105"
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner-soft transition-transform group-hover:scale-105"
                                         style={{ backgroundColor: `${info.color}15`, color: info.color }}>
-                                        <CategoryIcon iconName={info.icon} size={24} strokeWidth={2.5} />
+                                        <CategoryIcon iconName={info.icon} size={22} strokeWidth={2.5} />
                                     </div>
                                     <div>
                                         <p className="font-black text-gray-900 text-[16px] leading-tight mb-1">{tx.note || 'Bezejmenná'}</p>

@@ -87,10 +87,15 @@ export default function Analytics() {
 
             {activeTab === 'overview' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {/* Summary Card */}
-                    <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-white shadow-xl">
-                        <p className="text-gray-400 text-sm font-medium">Celkem utraceno (tento měsíc)</p>
-                        <h2 className="text-4xl font-bold mt-1">{totalExpense.toLocaleString()} Kč</h2>
+                    {/* Summary Card - Centered with theme color */}
+                    <div className="bg-gradient-to-br from-primary to-primary-dark rounded-[2.5rem] p-8 text-white shadow-xl shadow-primary/20 text-center relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl opacity-50"></div>
+                        <div className="relative z-10">
+                            <p className="text-white/60 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Celkem utraceno (tento měsíc)</p>
+                            <h2 className="text-4xl font-black tracking-tighter leading-none">
+                                {totalExpense.toLocaleString('cs-CZ')} <span className="text-xl font-bold opacity-40 ml-1 text-white">Kč</span>
+                            </h2>
+                        </div>
                     </div>
 
                     {/* Chart */}
