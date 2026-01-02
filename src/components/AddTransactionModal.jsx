@@ -98,17 +98,23 @@ export default function AddTransactionModal({ isOpen, onClose }) {
 
                     {/* Amount Input */}
                     <div>
-                        <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Částka</label>
-                        <div className="relative">
+                        <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Částka</label>
+                        <div className="relative bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 focus-within:border-blue-500 transition-colors">
                             <input
-                                type="number"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
+                                type="text"
+                                inputMode="numeric"
+                                value={amount ? parseFloat(amount.replace(/\s/g, '')).toLocaleString('cs-CZ') : ''}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\s/g, '');
+                                    if (value === '' || /^\d+$/.test(value)) {
+                                        setAmount(value);
+                                    }
+                                }}
                                 placeholder="0"
-                                className="w-full text-4xl font-bold text-gray-900 bg-transparent border-none focus:ring-0 p-0 placeholder-gray-300"
+                                className="w-full text-3xl font-bold text-gray-900 bg-transparent border-none focus:ring-0 p-0 placeholder-gray-300 pr-12"
                                 autoFocus
                             />
-                            <span className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-xl">Kč</span>
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-xl">Kč</span>
                         </div>
                     </div>
 
