@@ -5,20 +5,27 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import AddTransactionModal from '../components/AddTransactionModal';
 
-// Helper to get emoji for category
-const getCategoryEmoji = (categoryName) => {
+// Helper to get emoji for category based on its icon name
+const getCategoryEmoji = (iconName) => {
     const emojis = {
-        'Jídlo': '🍔',
-        'Bydlení': '🏠',
-        'Doprava': '🚗',
-        'Zábava': '🎮',
-        'Mzda': '💰',
-        'Nákupy': '🛍️',
-        'Zdraví': '🏥',
-        'Vzdělání': '📚',
-        'Ostatní': '📦'
+        'Utensils': '🍔',
+        'Home': '🏠',
+        'Car': '🚗',
+        'Gamepad2': '🎮',
+        'Banknote': '💰',
+        'ShoppingBag': '🛍️',
+        'Coffee': '☕',
+        'Smartphone': '📱',
+        'Gift': '🎁',
+        'Heart': '❤️',
+        'Briefcase': '💼',
+        'Zap': '⚡',
+        'Bus': '🚌',
+        'Plane': '✈️',
+        'CreditCard': '💳',
+        'Wallet': '👛'
     };
-    return emojis[categoryName] || '💸';
+    return emojis[iconName] || '💸';
 };
 
 export default function Dashboard() {
@@ -33,7 +40,7 @@ export default function Dashboard() {
         const category = categories?.find(c => c.id === categoryId);
         return {
             name: category?.name || 'Bez kategorie',
-            emoji: getCategoryEmoji(category?.name)
+            emoji: getCategoryEmoji(category?.icon)
         };
     };
 
@@ -46,24 +53,21 @@ export default function Dashboard() {
                     <h1 className="text-4xl font-black text-gray-900 tracking-tighter">Přehled</h1>
                     <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mt-1">Dobrý den!</p>
                 </div>
-                <div className="w-14 h-14 bg-white rounded-2xl shadow-premium flex items-center justify-center text-primary">
-                    <Wallet size={28} strokeWidth={2.5} />
-                </div>
             </header>
 
-            {/* --- BALANCES CARD (MASSIVE) --- */}
+            {/* --- BALANCES CARD (REFINED) --- */}
             <div className="bg-gradient-to-br from-primary to-primary-dark rounded-[3rem] p-10 text-white shadow-2xl shadow-primary/40 relative overflow-hidden group transition-transform active:scale-[0.98]">
                 {/* Immersive Decorative Elements */}
                 <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-700"></div>
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full -ml-20 -mb-20 blur-3xl opacity-30"></div>
 
-                <div className="relative z-10 space-y-2">
-                    <p className="text-white/60 text-xs font-black uppercase tracking-[0.2em] mb-2">Celkový zůstatek</p>
+                <div className="relative z-10 space-y-1">
+                    <p className="text-white/60 text-xs font-black uppercase tracking-[0.2em] mb-1">Celkový zůstatek</p>
                     <div className="flex items-baseline gap-3">
-                        <h2 className="text-6xl font-black tracking-tighter leading-none">
+                        <h2 className="text-5xl font-black tracking-tighter leading-none">
                             {totalBalance.toLocaleString('cs-CZ')}
                         </h2>
-                        <span className="text-3xl font-bold opacity-40">Kč</span>
+                        <span className="text-2xl font-bold opacity-40">Kč</span>
                     </div>
                 </div>
             </div>
@@ -119,12 +123,12 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-right flex items-baseline gap-2">
                                     <p className={`font-black tabular-nums text-xl tracking-tighter ${tx.type === 'expense' ? 'text-gray-900' : 'text-green-600'
                                         }`}>
                                         {tx.type === 'expense' ? '-' : '+'}{tx.amount.toLocaleString('cs-CZ')}
                                     </p>
-                                    <p className="text-[10px] font-bold text-gray-300 uppercase leading-none">Kč</p>
+                                    <span className="text-[10px] font-black text-gray-300 uppercase">Kč</span>
                                 </div>
                             </div>
                         );
