@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -41,10 +42,6 @@ export default function Transactions() {
 
     return (
         <div className="p-4 pb-24 space-y-6 max-w-2xl mx-auto">
-            <div className="flex justify-between items-end mb-3 px-1">
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider opacity-60">Nedávná aktivita</h3>
-                <Link to="/transactions" className="text-primary text-xs font-bold hover:text-primary-dark bg-primary/10 px-3 py-1 rounded-full">Vše</Link>
-            </div>
             <header>
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Transakce</h1>
                 <p className="text-gray-500 mt-1">Historie vašich příjmů a výdajů</p>

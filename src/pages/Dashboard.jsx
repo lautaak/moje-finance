@@ -19,119 +19,102 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50/50 pb-24">
+        <div className="p-4 pb-24 space-y-7 max-w-2xl mx-auto animate-in fade-in duration-500">
 
-            {/* --- HERO SECTION --- */}
-            <div className="relative pt-12 pb-20 px-6 overflow-hidden">
-                {/* Immersive Background Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-dark z-0"></div>
+            {/* --- CLEAN HEADER --- */}
+            <header className="flex justify-between items-center py-2">
+                <div>
+                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Přehled</h1>
+                    <p className="text-gray-400 text-sm font-medium">Vítejte zpět</p>
+                </div>
+                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-400">
+                    <Wallet size={24} />
+                </div>
+            </header>
 
-                {/* Decorative Elements */}
-                <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl z-0 animate-pulse"></div>
-                <div className="absolute top-1/2 -left-12 w-48 h-48 bg-black/5 rounded-full blur-2xl z-0"></div>
+            {/* --- BALANCES CARD (REFINED) --- */}
+            <div className="bg-gradient-to-br from-primary to-primary-dark rounded-[2.5rem] p-8 text-white shadow-2xl shadow-primary/30 relative overflow-hidden">
+                {/* Subtle Decorative Layers */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-16 -mb-16 blur-2xl"></div>
 
-                <header className="relative z-10 flex justify-between items-center mb-10 text-white/90">
-                    <div>
-                        <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Účetní zůstatek</p>
-                        <h1 className="text-4xl font-black tracking-tighter text-white">
-                            {totalBalance.toLocaleString('cs-CZ')} <span className="text-xl font-medium opacity-60 ml-1">Kč</span>
-                        </h1>
+                <div className="relative z-10 space-y-1">
+                    <p className="text-white/70 text-xs font-black uppercase tracking-widest">Celkový zůstatek</p>
+                    <div className="flex items-baseline gap-2">
+                        <h2 className="text-5xl font-black tracking-tighter">
+                            {totalBalance.toLocaleString('cs-CZ')}
+                        </h2>
+                        <span className="text-2xl font-medium opacity-50">Kč</span>
                     </div>
-                    <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center shadow-lg">
-                        <Wallet className="text-white" size={24} strokeWidth={2} />
-                    </div>
-                </header>
+                </div>
 
-                {/* Quick Actions / Summary Pills */}
-                <div className="relative z-10 flex gap-3 overflow-x-auto no-scrollbar pb-2">
-                    <div className="glass px-4 py-2.5 rounded-2xl flex items-center gap-2 whitespace-nowrap shadow-sm">
-                        <ArrowUpRight size={16} className="text-green-400" strokeWidth={3} />
-                        <span className="text-xs font-bold text-white">+ 2 450 Kč dnes</span>
-                    </div>
-                    <div className="glass px-4 py-2.5 rounded-2xl flex items-center gap-2 whitespace-nowrap shadow-sm">
-                        <ArrowDownLeft size={16} className="text-red-300" strokeWidth={3} />
-                        <span className="text-xs font-bold text-white">- 890 Kč dnes</span>
+                <div className="relative z-10 mt-8 flex gap-4">
+                    <div className="bg-white/15 backdrop-blur-sm px-4 py-2 rounded-2xl flex items-center gap-2">
+                        <ArrowUpRight size={16} className="text-green-300" strokeWidth={3} />
+                        <span className="text-xs font-bold text-white">Přehledné úspory</span>
                     </div>
                 </div>
             </div>
 
-            {/* --- CONTENT AREA (Negative Margin overlap) --- */}
-            <div className="relative z-20 -mt-10 px-4 space-y-8">
-
-                {/* Accounts Grid - Horizontal Scroll or Grid */}
-                <div>
-                    <div className="flex justify-between items-center mb-4 px-2">
-                        <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest opacity-40">Moje Peněženky</h3>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        {accounts?.map(account => (
-                            <div
-                                key={account.id}
-                                className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-premium active:scale-95 transition-all group"
-                            >
-                                <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
-                                    <Wallet size={20} strokeWidth={2.5} />
+            {/* --- ACCOUNTS --- */}
+            <section>
+                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-1">Vaše Účty</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    {accounts?.map(account => (
+                        <div key={account.id} className="bg-white px-5 py-6 rounded-[2rem] border border-gray-100 shadow-sm active:scale-95 transition-all">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-9 h-9 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                                    <Wallet size={18} strokeWidth={2.5} />
                                 </div>
-                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">{account.name}</p>
-                                <p className="font-bold text-xl text-gray-900 tracking-tight">
-                                    {account.balance.toLocaleString('cs-CZ')}
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">{account.name}</span>
+                            </div>
+                            <p className="text-xl font-black text-gray-900 tracking-tight">
+                                {account.balance.toLocaleString('cs-CZ')} <span className="text-sm font-medium opacity-30">Kč</span>
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* --- RECENT ACTIVITY --- */}
+            <section>
+                <div className="flex justify-between items-center mb-4 px-1">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Nedávná aktivita</h3>
+                    <Link to="/transactions" className="text-primary text-[10px] font-black uppercase tracking-widest hover:opacity-70 transition-opacity">Zobrazit vše</Link>
+                </div>
+
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-50 overflow-hidden divide-y divide-gray-50/50">
+                    {transactions?.map((tx) => (
+                        <div
+                            key={tx.id}
+                            onClick={() => setEditingTransaction(tx)}
+                            className="p-5 flex justify-between items-center active:bg-gray-50 transition-all cursor-pointer group"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${tx.type === 'income' ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-500'
+                                    }`}>
+                                    {tx.type === 'income' ? <ArrowUpRight size={20} strokeWidth={2.5} /> : <ArrowDownLeft size={20} strokeWidth={2.5} />}
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-900 text-sm leading-tight mb-1">{tx.note || 'Platba'}</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-300">
+                                        {getCategoryName(tx.categoryId)}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className={`font-black tabular-nums text-base tracking-tighter ${tx.type === 'expense' ? 'text-gray-900' : 'text-green-600'
+                                    }`}>
+                                    {tx.type === 'expense' ? '-' : '+'}{tx.amount.toLocaleString('cs-CZ')}
                                 </p>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
+                    {transactions?.length === 0 && (
+                        <div className="p-10 text-center text-gray-300 text-sm font-medium italic">Žádné nedávné pohyby</div>
+                    )}
                 </div>
-
-                {/* Recent Activity - Detailed List */}
-                <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-                    <div className="flex justify-between items-center mb-4 px-2">
-                        <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest opacity-40">Poslední Pohyby</h3>
-                        <Link to="/transactions" className="text-primary text-xs font-black uppercase tracking-widest hover:opacity-70 transition-opacity">Všechny</Link>
-                    </div>
-
-                    <div className="bg-white rounded-[2.5rem] shadow-premium border border-gray-50 overflow-hidden divide-y divide-gray-50/50">
-                        {transactions?.length === 0 && (
-                            <div className="p-10 text-center flex flex-col items-center gap-3">
-                                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-200">
-                                    <List size={32} />
-                                </div>
-                                <p className="text-gray-400 text-sm font-medium">Zatím žádná aktivita k vidění</p>
-                            </div>
-                        )}
-                        {transactions?.map((tx) => (
-                            <div
-                                key={tx.id}
-                                onClick={() => setEditingTransaction(tx)}
-                                className="p-6 flex justify-between items-center active:bg-gray-50/80 transition-all cursor-pointer group"
-                            >
-                                <div className="flex items-center gap-5">
-                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 ${tx.type === 'income' ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-600'
-                                        }`}>
-                                        {tx.type === 'income' ? <ArrowUpRight size={22} strokeWidth={2.5} /> : <ArrowDownLeft size={22} strokeWidth={2.5} />}
-                                    </div>
-                                    <div>
-                                        <p className="font-black text-gray-900 text-[15px] leading-tight mb-1">{tx.note || 'Bezejmenná platba'}</p>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/60 bg-primary/5 px-2 py-0.5 rounded-lg">
-                                                {getCategoryName(tx.categoryId)}
-                                            </span>
-                                            <span className="text-[10px] font-bold text-gray-300">
-                                                {new Date(tx.date).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short' })}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className={`font-black tabular-nums text-lg tracking-tighter ${tx.type === 'expense' ? 'text-gray-900' : 'text-green-600'
-                                        }`}>
-                                        {tx.type === 'expense' ? '-' : '+'}{tx.amount.toLocaleString('cs-CZ')}
-                                    </p>
-                                    <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">Kč</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+            </section>
 
             {/* Edit Transaction Modal */}
             {editingTransaction && (
