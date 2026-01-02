@@ -59,8 +59,8 @@ export default function AddTransactionModal({ isOpen, onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 pb-24 animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-300 max-h-[85vh] overflow-y-auto">
 
                 {/* Header */}
                 <div className="flex justify-between items-center p-4 border-b border-gray-100">
@@ -78,8 +78,8 @@ export default function AddTransactionModal({ isOpen, onClose }) {
                             type="button"
                             onClick={() => setType('expense')}
                             className={`py-2 text-sm font-medium rounded-lg transition-all ${type === 'expense'
-                                    ? 'bg-white text-red-600 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-white text-red-600 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             Výdaj
@@ -88,8 +88,8 @@ export default function AddTransactionModal({ isOpen, onClose }) {
                             type="button"
                             onClick={() => setType('income')}
                             className={`py-2 text-sm font-medium rounded-lg transition-all ${type === 'income'
-                                    ? 'bg-white text-green-600 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-white text-green-600 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             Příjem
