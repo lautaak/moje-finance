@@ -8,11 +8,11 @@ export const themes = {
         gradient: 'from-gray-600 to-slate-800'
     },
     blue: {
-        name: 'Královská',
-        primary: '#4f46e5', // original indigo-600
-        primaryDark: '#3730a3', // original indigo-800
-        primaryLight: '#818cf8', // original indigo-400
-        gradient: 'from-indigo-600 to-blue-700'
+        name: 'Modrá',
+        primary: '#3b82f6', // blue-500
+        primaryDark: '#2563eb', // blue-600
+        primaryLight: '#60a5fa', // blue-400
+        gradient: 'from-blue-600 to-indigo-700'
     },
     ocean: {
         name: 'Oceán',
