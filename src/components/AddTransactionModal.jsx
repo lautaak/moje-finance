@@ -28,21 +28,26 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
             setDate(new Date(editTransaction.date).toISOString().split('T')[0]);
             setIsRecurring(false); // Editing doesn't support recurring yet
         } else {
-            // Reset for new transaction
-            setType('expense');
-            setAmount('');
-            setNote('');
-            setDate(new Date().toISOString().split('T')[0]);
-            setIsRecurring(false);
-            setRecurringFrequency('monthly');
-            setRecurringDay(1);
+            // For new transactions, reset fields (except type if user is toggling)
+            if (!isOpen) {
+                setAmount('');
+                setNote('');
+                setDate(new Date().toISOString().split('T')[0]);
+                setIsRecurring(false);
+            }
 
-            if (categories && categories.length > 0 && !categoryId) {
-                const defaultCat = categories.find(c => c.type === type) || categories[0];
-                setCategoryId(defaultCat.id);
+            // Auto-select valid category for current type
+            if (categories && categories.length > 0) {
+                const currentCat = categories.find(c => Number(c.id) === Number(categoryId));
+                const currentCatType = currentCat?.type || 'expense';
+
+                if (!categoryId || currentCatType !== type) {
+                    const defaultCat = categories.find(c => (c.type || 'expense') === type) || categories[0];
+                    if (defaultCat) setCategoryId(defaultCat.id);
+                }
             }
         }
-    }, [accounts, categories, type, editTransaction]);
+    }, [isOpen, categories, type, editTransaction]);
 
     // Close modal on navigation
     useEffect(() => {
@@ -273,7 +278,7 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                             className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary transition-colors appearance-none"
                         >
                             <option value="" disabled>Vyberte kategorii</option>
-                            {categories?.map(cat => (
+                            {categories?.filter(cat => (cat.type || 'expense') === type).map(cat => (
                                 <option key={cat.id} value={cat.id}>{cat.name}</option>
                             ))}
                         </select>

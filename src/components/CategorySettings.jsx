@@ -16,6 +16,7 @@ export default function CategorySettings() {
     const [newCatName, setNewCatName] = useState('');
     const [newCatColor, setNewCatColor] = useState('#3b82f6');
     const [newCatIcon, setNewCatIcon] = useState('ShoppingBag');
+    const [newCatType, setNewCatType] = useState('expense');
 
     const handleDelete = async (id) => {
         if (confirm('Opravdu smazat tuto kategorii?')) {
@@ -28,7 +29,8 @@ export default function CategorySettings() {
         await db.categories.add({
             name: newCatName,
             color: newCatColor,
-            icon: newCatIcon
+            icon: newCatIcon,
+            type: newCatType
         });
         setNewCatName('');
         setIsAdding(false);
@@ -58,9 +60,33 @@ export default function CategorySettings() {
                             placeholder="Název kategorie"
                             value={newCatName}
                             onChange={e => setNewCatName(e.target.value)}
-                            className="w-full p-2 rounded-lg border border-gray-200 text-sm"
+                            className="w-full p-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary focus:outline-none"
                             autoFocus
                         />
+
+                        {/* Type Switcher */}
+                        <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+                            <button
+                                type="button"
+                                onClick={() => setNewCatType('expense')}
+                                className={`py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${newCatType === 'expense'
+                                    ? 'bg-white text-red-600 shadow-sm'
+                                    : 'text-gray-500'
+                                    }`}
+                            >
+                                Výdaj
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setNewCatType('income')}
+                                className={`py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${newCatType === 'income'
+                                    ? 'bg-white text-green-600 shadow-sm'
+                                    : 'text-gray-500'
+                                    }`}
+                            >
+                                Příjem
+                            </button>
+                        </div>
 
                         <div className="flex gap-2 items-center overflow-x-auto pb-2">
                             {Object.keys(ICON_MAP).map(iconName => {
