@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import {
-    Check,
+    Check, Plus, Trash2, X,
     ShoppingBag, Coffee, Car, Home,
     Smartphone, Gift, Heart, Briefcase,
     Utensils, Zap, Bus, Plane, Palette

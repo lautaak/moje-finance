@@ -55,15 +55,18 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
 
     const formatInputAmount = (val) => {
         if (!val) return '';
-        // Remove all non-numeric characters except for the decimal point
-        const clean = val.toString().replace(/[^\d.]/g, '');
+        // Normalize: spaces are removed, comma is replaced by dot for internal processing
+        const clean = val.toString().replace(/\s/g, '').replace(',', '.').replace(/[^\d.]/g, '');
         const parts = clean.split('.');
+        // Add thousands separator (space) to integer part
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-        return parts.join('.');
+        return parts.join(','); // Display with Czech comma separator if there is a decimal
     };
 
     const handleAmountChange = (e) => {
-        const val = e.target.value.replace(/\s/g, '');
+        // Accept input with spaces, comma or dot
+        let val = e.target.value.replace(/\s/g, '').replace(',', '.');
+        // Allow numeric values with at most one dot
         if (val === '' || /^\d*\.?\d*$/.test(val)) {
             setAmount(val);
         }
@@ -374,7 +377,7 @@ export default function AddTransactionModal({ isOpen, onClose, editTransaction =
                     </div>
 
                 </form>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }
