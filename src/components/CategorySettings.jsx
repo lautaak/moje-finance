@@ -113,7 +113,7 @@ export default function CategorySettings() {
                 </button>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50">
 
                 {/* Add Form */}
                 {isAdding && (
@@ -190,7 +190,7 @@ export default function CategorySettings() {
                                             {/* Preview & Hex */}
                                             <div className="flex items-center gap-4">
                                                 <div
-                                                    className="w-16 h-16 rounded-2xl shadow-inner border border-gray-100"
+                                                    className="w-12 h-12 rounded-2xl shadow-inner border border-gray-100"
                                                     style={{ backgroundColor: tempColor }}
                                                 />
                                                 <div className="flex-1">
