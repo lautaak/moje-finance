@@ -95,26 +95,26 @@ export default function Analytics() {
                     {/* Summary Cards Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         {/* Income Card */}
-                        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col justify-between relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
-                            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Příjmy</p>
+                        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-green-100 flex flex-col justify-between relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                            <p className="text-green-600/60 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Příjmy</p>
                             <div>
-                                <h2 className="text-2xl font-black tracking-tighter text-gray-900">
+                                <h2 className="text-2xl font-black tracking-tighter text-green-900">
                                     {totalIncome.toLocaleString('cs-CZ')}
                                 </h2>
-                                <span className="text-xs font-bold text-gray-300">Kč</span>
+                                <span className="text-xs font-bold text-green-300">Kč</span>
                             </div>
                         </div>
 
                         {/* Expense Card */}
-                        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col justify-between relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
-                            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Výdaje</p>
+                        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-red-100 flex flex-col justify-between relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                            <p className="text-red-600/60 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Výdaje</p>
                             <div>
-                                <h2 className="text-2xl font-black tracking-tighter text-gray-900">
+                                <h2 className="text-2xl font-black tracking-tighter text-red-900">
                                     {totalExpense.toLocaleString('cs-CZ')}
                                 </h2>
-                                <span className="text-xs font-bold text-gray-300">Kč</span>
+                                <span className="text-xs font-bold text-red-300">Kč</span>
                             </div>
                         </div>
                     </div>
