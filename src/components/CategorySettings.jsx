@@ -17,7 +17,35 @@ export default function CategorySettings() {
     const [newCatColor, setNewCatColor] = useState('#3b82f6');
     const [newCatIcon, setNewCatIcon] = useState('ShoppingBag');
     const [newCatType, setNewCatType] = useState('expense');
+    const [newCatType, setNewCatType] = useState('expense');
     const [editingId, setEditingId] = useState(null);
+
+    // Custom Color Picker State
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const [hue, setHue] = useState(210); // Default Blue
+    const [tempColor, setTempColor] = useState('#3b82f6');
+
+    // Helper: HSL to Hex
+    const hslToHex = (h, s, l) => {
+        l /= 100;
+        const a = s * Math.min(l, 1 - l) / 100;
+        const f = n => {
+            const k = (n + h / 30) % 12;
+            const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+            return Math.round(255 * color).toString(16).padStart(2, '0');
+        };
+        return `#${f(0)}${f(8)}${f(4)}`;
+    };
+
+    // Generate shades based on current hue
+    const getShades = () => {
+        const shades = [];
+        // High Saturation, Varying Lightness
+        for (let l = 20; l <= 80; l += 15) shades.push(hslToHex(hue, 90, l));
+        // Medium Saturation
+        for (let l = 30; l <= 70; l += 20) shades.push(hslToHex(hue, 60, l));
+        return shades;
+    };
 
     const handleDelete = async (id) => {
         if (confirm('Opravdu smazat tuto kategorii?')) {
@@ -155,20 +183,92 @@ export default function CategorySettings() {
                                         style={{ backgroundColor: color }}
                                     />
                                 ))}
+                                {showColorPicker && (
+                                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-200">
+                                        <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-6">
+                                            <h3 className="text-xl font-bold text-gray-900">Vybrat barvu</h3>
+
+                                            {/* Preview & Hex */}
+                                            <div className="flex items-center gap-4">
+                                                <div
+                                                    className="w-16 h-16 rounded-2xl shadow-inner border border-gray-100"
+                                                    style={{ backgroundColor: tempColor }}
+                                                />
+                                                <div className="flex-1">
+                                                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1 block">HEX Kód</label>
+                                                    <input
+                                                        type="text"
+                                                        value={tempColor}
+                                                        onChange={(e) => setTempColor(e.target.value)}
+                                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 font-mono text-sm uppercase focus:ring-2 focus:ring-primary focus:outline-none"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Hue Slider */}
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Odstín</label>
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="360"
+                                                    value={hue}
+                                                    onChange={(e) => setHue(Number(e.target.value))}
+                                                    className="w-full h-4 rounded-full appearance-none cursor-pointer"
+                                                    style={{
+                                                        background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)'
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {/* Shades Grid */}
+                                            <div className="grid grid-cols-5 gap-2">
+                                                {getShades().map((shade, i) => (
+                                                    <button
+                                                        key={i}
+                                                        type="button"
+                                                        onClick={() => setTempColor(shade)}
+                                                        className={`w-full aspect-square rounded-xl transition-transform hover:scale-105 ${tempColor === shade ? 'ring-2 ring-gray-900 scale-105' : ''}`}
+                                                        style={{ backgroundColor: shade }}
+                                                    />
+                                                ))}
+                                            </div>
+
+                                            {/* Actions */}
+                                            <div className="flex gap-3 pt-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setNewCatColor(tempColor);
+                                                        setShowColorPicker(false);
+                                                    }}
+                                                    className="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-black transition-colors"
+                                                >
+                                                    Použít
+                                                </button>
+                                                <button
+                                                    onClick={() => setShowColorPicker(false)}
+                                                    className="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                                                >
+                                                    Zrušit
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Custom Color Picker Trigger */}
                                 <div className="relative group">
-                                    <div
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setTempColor(newCatColor);
+                                            setShowColorPicker(true);
+                                        }}
                                         className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all cursor-pointer overflow-hidden ${!['#ef4444', '#f97316', '#f59e0b', '#10b981', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#64748b', '#475569', '#1e293b'].includes(newCatColor) ? 'border-gray-900 scale-110 shadow-md' : 'border-transparent'}`}
                                         style={{ backgroundColor: newCatColor }}
                                     >
                                         <Palette size={14} className={newCatColor === '#ffffff' ? 'text-gray-900' : 'text-white'} />
-                                        <input
-                                            type="color"
-                                            value={newCatColor}
-                                            onChange={e => setNewCatColor(e.target.value)}
-                                            className="absolute inset-0 opacity-0 cursor-pointer scale-150"
-                                        />
-                                    </div>
+                                    </button>
                                     <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap w-max pointer-events-none font-medium shadow-sm">
                                         Vlastní
                                     </span>
