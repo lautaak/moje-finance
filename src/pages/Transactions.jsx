@@ -4,7 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { format, isToday, isYesterday } from 'date-fns';
 import { cs } from 'date-fns/locale';
-import { ArrowUpRight, ArrowDownLeft, Calendar, Search, X } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, Calendar, Search, X, ChevronDown } from 'lucide-react';
 import AddTransactionModal from '../components/AddTransactionModal';
 import CategoryIcon from '../components/CategoryIcon';
 
@@ -13,6 +13,7 @@ export default function Transactions() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMonth, setSelectedMonth] = useState(''); // YYYY-MM
     const [selectedCategory, setSelectedCategory] = useState(''); // Category ID or ''
+    const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
     const transactions = useLiveQuery(() =>
         db.transactions.orderBy('date').reverse().toArray()
     );
@@ -79,7 +80,7 @@ export default function Transactions() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Hledat transakce..."
+                            placeholder="Hledat..."
                             className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
                         />
                         {searchTerm && (
@@ -105,18 +106,60 @@ export default function Transactions() {
                         />
                     </div>
 
-                    {/* Category Picker */}
+                    {/* Category Picker (Custom Dropdown) */}
                     <div className="relative">
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="h-full bg-white border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-medium text-gray-700 cursor-pointer appearance-none min-w-[4rem]"
+                        <button
+                            onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                            className="h-full bg-white border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-medium text-gray-700 cursor-pointer flex items-center gap-2 min-w-[5rem] justify-between"
                         >
-                            <option value="">Vše</option>
-                            {categories?.map(c => (
-                                <option key={c.id} value={c.id}>{c.emoji || '📂'} {c.name}</option>
-                            ))}
-                        </select>
+                            {selectedCategory ? (
+                                <div className="flex items-center gap-2">
+                                    <div
+                                        className="w-4 h-4 rounded-full flex items-center justify-center text-[10px]"
+                                        style={{ backgroundColor: getCategory(parseInt(selectedCategory))?.color, color: 'white' }}
+                                    >
+                                        <CategoryIcon iconName={getCategory(parseInt(selectedCategory))?.icon} size={10} />
+                                    </div>
+                                    <span className="truncate max-w-[4rem]">{getCategory(parseInt(selectedCategory))?.name}</span>
+                                </div>
+                            ) : (
+                                <span>Vše</span>
+                            )}
+                            <ChevronDown size={14} className="text-gray-400" />
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {isCategoryDropdownOpen && (
+                            <>
+                                <div
+                                    className="fixed inset-0 z-20"
+                                    onClick={() => setIsCategoryDropdownOpen(false)}
+                                />
+                                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-30 max-h-80 overflow-y-auto animate-in fade-in slide-in-from-top-2">
+                                    <button
+                                        onClick={() => { setSelectedCategory(''); setIsCategoryDropdownOpen(false); }}
+                                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 text-gray-700 font-medium"
+                                    >
+                                        Všechny kategorie
+                                    </button>
+                                    {categories?.map(c => (
+                                        <button
+                                            key={c.id}
+                                            onClick={() => { setSelectedCategory(c.id); setIsCategoryDropdownOpen(false); }}
+                                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-3"
+                                        >
+                                            <div
+                                                className="w-6 h-6 rounded-lg flex items-center justify-center text-white shadow-sm"
+                                                style={{ backgroundColor: c.color }}
+                                            >
+                                                <CategoryIcon iconName={c.icon} size={12} />
+                                            </div>
+                                            <span className="font-medium text-gray-700">{c.name}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 
