@@ -17,6 +17,7 @@ export default function CategorySettings() {
     const [newCatColor, setNewCatColor] = useState('#3b82f6');
     const [newCatIcon, setNewCatIcon] = useState('ShoppingBag');
     const [newCatType, setNewCatType] = useState('expense');
+    const [editingId, setEditingId] = useState(null);
 
     const handleDelete = async (id) => {
         if (confirm('Opravdu smazat tuto kategorii?')) {
@@ -24,16 +25,46 @@ export default function CategorySettings() {
         }
     };
 
-    const handleAdd = async () => {
+    const handleSave = async () => {
         if (!newCatName) return;
-        await db.categories.add({
-            name: newCatName,
-            color: newCatColor,
-            icon: newCatIcon,
-            type: newCatType
-        });
+
+        if (editingId) {
+            await db.categories.update(editingId, {
+                name: newCatName,
+                color: newCatColor,
+                icon: newCatIcon,
+                type: newCatType
+            });
+            setEditingId(null);
+        } else {
+            await db.categories.add({
+                name: newCatName,
+                color: newCatColor,
+                icon: newCatIcon,
+                type: newCatType
+            });
+        }
+
         setNewCatName('');
         setIsAdding(false);
+    };
+
+    const handleEdit = (cat) => {
+        setNewCatName(cat.name);
+        setNewCatColor(cat.color);
+        setNewCatIcon(cat.icon);
+        setNewCatType(cat.type || 'expense');
+        setEditingId(cat.id);
+        setIsAdding(true);
+    };
+
+    const cancelEdit = () => {
+        setIsAdding(false);
+        setEditingId(null);
+        setNewCatName('');
+        setNewCatType('expense');
+        setNewCatColor('#3b82f6');
+        setNewCatIcon('ShoppingBag');
     };
 
     if (!categories) return null;
@@ -43,7 +74,12 @@ export default function CategorySettings() {
             <div className="flex justify-between items-center px-1">
                 <h2 className="text-sm font-black text-gray-900 uppercase tracking-[0.2em] opacity-40">Kategorie</h2>
                 <button
-                    onClick={() => setIsAdding(true)}
+                    onClick={() => {
+                        setEditingId(null);
+                        setNewCatName('');
+                        setNewCatType('expense');
+                        setIsAdding(true);
+                    }}
                     className="bg-primary/10 text-primary px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-primary/20 transition-all flex items-center gap-2"
                 >
                     <Plus size={14} strokeWidth={3} /> Přidat
@@ -141,8 +177,10 @@ export default function CategorySettings() {
                         </div>
 
                         <div className="flex gap-2 pt-2">
-                            <button onClick={handleAdd} className="flex-1 bg-primary text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/30 hover:brightness-110 transition-all">Uložit kategorii</button>
-                            <button onClick={() => setIsAdding(false)} className="px-4 bg-gray-100 text-gray-500 rounded-xl hover:bg-gray-200 transition-all">
+                            <button onClick={handleSave} className="flex-1 bg-primary text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/30 hover:brightness-110 transition-all">
+                                {editingId ? 'Upravit kategorii' : 'Uložit kategorii'}
+                            </button>
+                            <button onClick={cancelEdit} className="px-4 bg-gray-100 text-gray-500 rounded-xl hover:bg-gray-200 transition-all">
                                 <X size={20} />
                             </button>
                         </div>
@@ -163,12 +201,20 @@ export default function CategorySettings() {
                                 </div>
                                 <span className="font-medium text-gray-900">{cat.name}</span>
                             </div>
-                            <button
-                                onClick={() => handleDelete(cat.id)}
-                                className="text-gray-300 hover:text-red-500 p-2"
-                            >
-                                <Trash2 size={16} />
-                            </button>
+                            <div className="flex items-center">
+                                <button
+                                    onClick={() => handleEdit(cat)}
+                                    className="text-gray-300 hover:text-blue-500 p-2"
+                                >
+                                    <Palette size={16} />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(cat.id)}
+                                    className="text-gray-300 hover:text-red-500 p-2"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
                         </div>
                     );
                 })}

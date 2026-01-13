@@ -18,9 +18,13 @@ export default function Analytics() {
         db.transactions
             .where('date')
             .between(start, end)
-            .filter(tx => tx.type === 'expense')
+            .where('date')
+            .between(start, end)
             .toArray()
     );
+
+    const incomeTransactions = monthTransactions?.filter(tx => tx.type === 'income') || [];
+    const expenseTransactions = monthTransactions?.filter(tx => tx.type === 'expense') || [];
 
     // Get ALL transactions for Comparison
     const allTransactions = useLiveQuery(() =>
@@ -29,11 +33,11 @@ export default function Analytics() {
 
     const categories = useLiveQuery(() => db.categories.toArray());
 
-    // Aggregate data for Pie Chart (Overview)
+    // Aggregate data for Pie Chart (Overview) - Expenses Only
     const pieData = useMemo(() => {
-        if (!monthTransactions || !categories) return [];
+        if (!expenseTransactions || !categories) return [];
 
-        const agg = monthTransactions.reduce((acc, tx) => {
+        const agg = expenseTransactions.reduce((acc, tx) => {
             const catId = tx.categoryId;
             if (!acc[catId]) acc[catId] = 0;
             acc[catId] += tx.amount;
@@ -49,9 +53,11 @@ export default function Analytics() {
             };
         }).sort((a, b) => b.value - a.value);
 
-    }, [monthTransactions, categories]);
+    }, [expenseTransactions, categories]);
 
     const totalExpense = pieData.reduce((sum, item) => sum + item.value, 0);
+    const totalIncome = incomeTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+    const netBalance = totalIncome - totalExpense;
 
     return (
         <div className="p-4 space-y-6 max-w-2xl mx-auto pb-24">
@@ -88,12 +94,40 @@ export default function Analytics() {
             {activeTab === 'overview' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                     {/* Summary Card - Centered with theme color */}
-                    <div className="bg-gradient-to-br from-primary to-primary-dark rounded-[2.5rem] p-8 text-white shadow-xl shadow-primary/20 text-center relative overflow-hidden">
+                    {/* Summary Cards Grid */}
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Income Card */}
+                        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col justify-between relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Příjmy</p>
+                            <div>
+                                <h2 className="text-2xl font-black tracking-tighter text-gray-900">
+                                    {totalIncome.toLocaleString('cs-CZ')}
+                                </h2>
+                                <span className="text-xs font-bold text-gray-300">Kč</span>
+                            </div>
+                        </div>
+
+                        {/* Expense Card */}
+                        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col justify-between relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Výdaje</p>
+                            <div>
+                                <h2 className="text-2xl font-black tracking-tighter text-gray-900">
+                                    {totalExpense.toLocaleString('cs-CZ')}
+                                </h2>
+                                <span className="text-xs font-bold text-gray-300">Kč</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Net Balance Card */}
+                    <div className={`rounded-[2.5rem] p-8 text-white shadow-xl text-center relative overflow-hidden transition-colors duration-500 ${netBalance >= 0 ? 'bg-gradient-to-br from-gray-800 to-gray-900 shadow-gray-900/20' : 'bg-gradient-to-br from-red-500 to-red-600 shadow-red-500/30'}`}>
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl opacity-50"></div>
                         <div className="relative z-10">
-                            <p className="text-white/60 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Celkem utraceno (tento měsíc)</p>
+                            <p className="text-white/60 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Bilance (Tento měsíc)</p>
                             <h2 className="text-4xl font-black tracking-tighter leading-none">
-                                {totalExpense.toLocaleString('cs-CZ')} <span className="text-xl font-bold opacity-40 ml-1 text-white">Kč</span>
+                                {netBalance > 0 ? '+' : ''}{netBalance.toLocaleString('cs-CZ')} <span className="text-xl font-bold opacity-40 ml-1 text-white">Kč</span>
                             </h2>
                         </div>
                     </div>
