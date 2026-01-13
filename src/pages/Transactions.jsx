@@ -154,7 +154,7 @@ export default function Transactions() {
                                             >
                                                 <CategoryIcon iconName={c.icon} size={12} />
                                             </div>
-                                            <span className="font-medium text-gray-700">{c.name}</span>
+                                            <span className="font-medium text-gray-700 truncate">{c.name}</span>
                                         </button>
                                     ))}
                                 </div>
