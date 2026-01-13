@@ -4,12 +4,14 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { format, isToday, isYesterday } from 'date-fns';
 import { cs } from 'date-fns/locale';
-import { ArrowUpRight, ArrowDownLeft, Calendar } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, Calendar, Search, X } from 'lucide-react';
 import AddTransactionModal from '../components/AddTransactionModal';
 import CategoryIcon from '../components/CategoryIcon';
 
 export default function Transactions() {
     const [editingTransaction, setEditingTransaction] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedMonth, setSelectedMonth] = useState(''); // YYYY-MM
     const transactions = useLiveQuery(() =>
         db.transactions.orderBy('date').reverse().toArray()
     );
@@ -19,11 +21,26 @@ export default function Transactions() {
     // Helper to get category details
     const getCategory = (id) => categories?.find(c => c.id === id);
 
+    // Filter transactions
+    const filteredTransactions = useMemo(() => {
+        if (!transactions) return [];
+        return transactions.filter(tx => {
+            const matchesSearch = searchTerm === '' ||
+                tx.note?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                getCategory(tx.categoryId)?.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+            const matchesMonth = selectedMonth === '' ||
+                format(tx.date, 'yyyy-MM') === selectedMonth;
+
+            return matchesSearch && matchesMonth;
+        });
+    }, [transactions, searchTerm, selectedMonth, categories]);
+
     // Group transactions by date
     const groupedTransactions = useMemo(() => {
-        if (!transactions) return {};
+        if (!filteredTransactions) return {};
 
-        return transactions.reduce((groups, tx) => {
+        return filteredTransactions.reduce((groups, tx) => {
             const dateStr = format(tx.date, 'yyyy-MM-dd');
             if (!groups[dateStr]) {
                 groups[dateStr] = [];
@@ -31,7 +48,7 @@ export default function Transactions() {
             groups[dateStr].push(tx);
             return groups;
         }, {});
-    }, [transactions]);
+    }, [filteredTransactions]);
 
     // Format header date (Dnes, Včera, or full date)
     const getDateHeader = (dateStr) => {
@@ -48,16 +65,77 @@ export default function Transactions() {
                 <p className="text-gray-500 mt-1">Historie vašich příjmů a výdajů</p>
             </header>
 
-            {(!transactions || transactions.length === 0) && (
+            {/* Filters */}
+            <div className="sticky top-0 z-20 bg-gray-50 pt-2 pb-4 space-y-3">
+                <div className="flex gap-2">
+                    {/* Search Bar */}
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Hledat transakce..."
+                            className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+                        />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                            >
+                                <X size={16} />
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Month Picker */}
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Calendar size={18} className="text-gray-500" />
+                        </div>
+                        <input
+                            type="month"
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-medium text-gray-700 cursor-pointer"
+                        />
+                    </div>
+                </div>
+
+                {/* Active Filter Tags */}
+                {(searchTerm || selectedMonth) && (
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                        {selectedMonth && (
+                            <button
+                                onClick={() => setSelectedMonth('')}
+                                className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wide hover:bg-primary/20 transition-colors whitespace-nowrap"
+                            >
+                                {format(new Date(selectedMonth), 'MMMM yyyy', { locale: cs })}
+                                <X size={12} />
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {(!filteredTransactions || filteredTransactions.length === 0) && (
                 <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                    <Calendar size={48} className="mb-4 opacity-50" />
-                    <p>Zatím zde nejsou žádné transakce.</p>
+                    <Search size={48} className="mb-4 opacity-50" />
+                    <p>Žádné transakce nenalezeny.</p>
+                    {(searchTerm || selectedMonth) && (
+                        <button
+                            onClick={() => { setSearchTerm(''); setSelectedMonth(''); }}
+                            className="mt-4 text-primary font-semibold text-sm hover:underline"
+                        >
+                            Zrušit filtry
+                        </button>
+                    )}
                 </div>
             )}
 
             {Object.entries(groupedTransactions).map(([dateStr, txs]) => (
                 <div key={dateStr} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 sticky top-0 bg-gray-50 py-2 z-10 w-full">
+                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 sticky top-[4.5rem] bg-gray-50 py-2 z-10 w-full backdrop-blur-sm bg-gray-50/90">
                         {getDateHeader(dateStr)}
                     </h3>
 
