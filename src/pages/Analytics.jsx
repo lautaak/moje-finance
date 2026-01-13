@@ -120,7 +120,7 @@ export default function Analytics() {
                     </div>
 
                     {/* Net Balance Card */}
-                    <div className={`rounded-[2.5rem] p-8 text-white shadow-xl text-center relative overflow-hidden transition-colors duration-500 ${netBalance >= 0 ? 'bg-gradient-to-br from-primary to-primary-dark shadow-primary/20' : 'bg-gradient-to-br from-red-500 to-red-600 shadow-red-500/30'}`}>
+                    <div className={`rounded-[2.5rem] p-8 text-white shadow-xl text-center relative overflow-hidden transition-colors duration-500 ${netBalance >= 0 ? 'bg-gradient-to-br from-primary to-primary-dark shadow-primary/20' : 'bg-gradient-to-br from-red-400 to-red-500 shadow-red-500/20'}`}>
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl opacity-50"></div>
                         <div className="relative z-10">
                             <p className="text-white/60 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Bilance (Tento měsíc)</p>

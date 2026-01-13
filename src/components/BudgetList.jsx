@@ -89,7 +89,7 @@ export default function BudgetList() {
                             type="number"
                             value={newBudgetAmount}
                             onChange={e => setNewBudgetAmount(e.target.value)}
-                            placeholder="5000"
+                            placeholder=""
                             className="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-primary transition-colors"
                         />
                     </div>
