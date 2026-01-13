@@ -17,7 +17,6 @@ export default function CategorySettings() {
     const [newCatColor, setNewCatColor] = useState('#3b82f6');
     const [newCatIcon, setNewCatIcon] = useState('ShoppingBag');
     const [newCatType, setNewCatType] = useState('expense');
-    const [newCatType, setNewCatType] = useState('expense');
     const [editingId, setEditingId] = useState(null);
 
     // Custom Color Picker State
